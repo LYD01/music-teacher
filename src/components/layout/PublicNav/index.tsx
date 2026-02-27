@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { authClient } from "@/lib/auth";
 
 const navLinks = [
 	{ href: "/blog", label: "Blog" },
@@ -11,11 +12,33 @@ const navLinks = [
 	{ href: "/sample", label: "Components" },
 ] as const;
 
+function UserAvatar({ name, image }: { name: string; image?: string | null }) {
+	const initials = name
+		.split(" ")
+		.map((s) => s[0])
+		.slice(0, 2)
+		.join("")
+		.toUpperCase();
+
+	return (
+		<span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-muted text-xs font-medium text-foreground">
+			{image ? (
+				<img src={image} alt="" className="h-full w-full rounded-full object-cover" />
+			) : (
+				initials
+			)}
+		</span>
+	);
+}
+
 export function PublicNav() {
 	const pathname = usePathname();
+	const { data: session, isPending } = authClient.useSession();
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const toggleRef = useRef<HTMLButtonElement>(null);
+
+	const isSignedIn = !isPending && !!session?.user;
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: close menu on route change
 	useEffect(() => {
@@ -91,20 +114,41 @@ export function PublicNav() {
 					})}
 				</nav>
 
-				{/* Desktop sign-in */}
+				{/* Desktop auth area */}
 				<div className="hidden items-center gap-3 md:flex">
-					<Link
-						href="/login"
-						className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-					>
-						Sign in
-					</Link>
-					<Link
-						href="/login"
-						className="inline-flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-					>
-						Get started
-					</Link>
+					{isPending ? (
+						<div className="h-8 w-20 animate-pulse rounded-md bg-muted" />
+					) : isSignedIn ? (
+						<>
+							<Link
+								href="/dashboard"
+								className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+							>
+								Dashboard
+							</Link>
+							<Link href="/dashboard" className="transition-opacity hover:opacity-80">
+								<UserAvatar
+									name={session.user.name || session.user.email}
+									image={session.user.image}
+								/>
+							</Link>
+						</>
+					) : (
+						<>
+							<Link
+								href="/auth/sign-in"
+								className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+							>
+								Sign in
+							</Link>
+							<Link
+								href="/auth/sign-up"
+								className="inline-flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+							>
+								Get started
+							</Link>
+						</>
+					)}
 				</div>
 
 				{/* Mobile hamburger */}
@@ -149,7 +193,7 @@ export function PublicNav() {
 				id="mobile-nav-menu"
 				aria-label="Mobile navigation"
 				className={`overflow-hidden border-t border-border transition-[max-height,opacity] duration-200 ease-in-out md:hidden ${
-					mobileOpen ? "max-h-80 opacity-100" : "max-h-0 border-t-transparent opacity-0"
+					mobileOpen ? "max-h-96 opacity-100" : "max-h-0 border-t-transparent opacity-0"
 				}`}
 			>
 				<nav className="space-y-1 px-6 py-4 sm:px-8">
@@ -171,18 +215,35 @@ export function PublicNav() {
 						);
 					})}
 					<div className="my-3 h-px bg-border" />
-					<Link
-						href="/login"
-						className="block rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-					>
-						Sign in
-					</Link>
-					<Link
-						href="/login"
-						className="mt-2 block rounded-lg bg-primary px-3 py-2.5 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-					>
-						Get started
-					</Link>
+					{isSignedIn ? (
+						<>
+							<Link
+								href="/dashboard"
+								className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+							>
+								<UserAvatar
+									name={session.user.name || session.user.email}
+									image={session.user.image}
+								/>
+								<span>Dashboard</span>
+							</Link>
+						</>
+					) : (
+						<>
+							<Link
+								href="/auth/sign-in"
+								className="block rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+							>
+								Sign in
+							</Link>
+							<Link
+								href="/auth/sign-up"
+								className="mt-2 block rounded-lg bg-primary px-3 py-2.5 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+							>
+								Get started
+							</Link>
+						</>
+					)}
 				</nav>
 			</section>
 		</header>

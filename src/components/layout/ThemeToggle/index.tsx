@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { MoonIcon, SunIcon } from "@/lib/nav/icons";
 
 const THEME_KEY = "amt-theme";
+const COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 
 type Theme = "light" | "dark" | "system";
 
@@ -14,6 +15,17 @@ function getStoredTheme(): Theme {
 		return stored;
 	}
 	return "system";
+}
+
+function persistTheme(theme: Theme) {
+	localStorage.setItem(THEME_KEY, theme);
+	if (theme === "system") {
+		// biome-ignore lint: intentional cookie management for SSR theme
+		document.cookie = `${THEME_KEY}=; path=/; max-age=0`;
+	} else {
+		// biome-ignore lint: intentional cookie management for SSR theme
+		document.cookie = `${THEME_KEY}=${theme}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+	}
 }
 
 function applyTheme(theme: Theme) {
@@ -33,7 +45,7 @@ export function ThemeToggle() {
 
 	useEffect(() => {
 		applyTheme(theme);
-		localStorage.setItem(THEME_KEY, theme);
+		persistTheme(theme);
 	}, [theme]);
 
 	const cycle = () => {

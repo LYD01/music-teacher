@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { authClient } from "@/lib/auth";
 import { LogOutIcon } from "@/lib/nav/icons";
 
 interface UserMenuProps {
@@ -15,6 +16,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user, role = "student" }: UserMenuProps) {
+	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const triggerRef = useRef<HTMLButtonElement>(null);
@@ -109,15 +111,20 @@ export function UserMenu({ user, role = "student" }: UserMenuProps) {
 						)}
 					</div>
 					<div className="border-t border-border py-1">
-						<Link
-							href="/api/auth/signout"
-							className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+						<button
+							type="button"
+							className="flex w-full items-center gap-2 px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 							role="menuitem"
-							onClick={() => setOpen(false)}
+							onClick={async () => {
+								setOpen(false);
+								await authClient.signOut();
+								router.push("/");
+								router.refresh();
+							}}
 						>
 							<LogOutIcon className="opacity-70" />
 							Sign out
-						</Link>
+						</button>
 					</div>
 				</div>
 			)}

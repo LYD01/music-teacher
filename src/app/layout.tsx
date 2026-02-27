@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { RouteAnnouncer } from "@/components/layout/RouteAnnouncer";
 import { SkipLink } from "@/components/layout/SkipLink";
-import { ThemeScript } from "@/components/layout/ThemeScript";
+import { NeonAuthProvider } from "@/components/providers/NeonAuthProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -21,21 +22,27 @@ export const metadata: Metadata = {
 	description: "Learn guitar with AI-powered feedback",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const cookieStore = await cookies();
+	const theme = cookieStore.get("amt-theme")?.value;
+	const themeClass =
+		theme === "dark" ? "dark" : theme === "light" ? "light" : undefined;
+
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang="en" className={themeClass} suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
 			>
-				<ThemeScript />
 				<SkipLink />
 				<RouteAnnouncer />
-				<div className="flex-1">{children}</div>
-				<Footer />
+				<NeonAuthProvider>
+					<div className="flex-1">{children}</div>
+					<Footer />
+				</NeonAuthProvider>
 			</body>
 		</html>
 	);

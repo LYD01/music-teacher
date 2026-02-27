@@ -1,9 +1,22 @@
-// Authenticated app layout: wraps all main app pages with AppShell (sidebar + header)
-// TODO: Add auth guard (redirect to /login if not authenticated)
-
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/layout/AppShell";
+import { auth } from "@/lib/auth-server";
 
-export default function AppLayout({ children }: { children: ReactNode }) {
-	return <AppShell>{children}</AppShell>;
+export const dynamic = "force-dynamic";
+
+export default async function AppLayout({ children }: { children: ReactNode }) {
+	const { data: session } = await auth.getSession();
+
+	if (!session?.user) {
+		redirect("/auth/sign-in");
+	}
+
+	const role = session.user.role === "admin" ? "admin" : "student";
+
+	return (
+		<AppShell user={session.user} role={role}>
+			{children}
+		</AppShell>
+	);
 }

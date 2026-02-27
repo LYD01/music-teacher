@@ -1,0 +1,1 @@
+# Don't put files bigger than 4kb, vercel puts /public folder content on a CDN and passes the cost to your bill.
