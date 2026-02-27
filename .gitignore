@@ -44,3 +44,4 @@ next-env.d.ts
 .env.dev
 .env.uat
 .env.prod
+.vercel

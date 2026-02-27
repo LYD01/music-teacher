@@ -11,4 +11,5 @@ export {
 } from "./Card";
 export { Input } from "./Input";
 export { ScrollWindow } from "./ScrollWindow";
+export { Modal } from "./Modal";
 export { Separator } from "./Separator";

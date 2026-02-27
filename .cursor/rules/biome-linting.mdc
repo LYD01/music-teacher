@@ -1,0 +1,60 @@
+---
+description: Biome.js linting and formatting rules for this project. Follow these when writing or editing any TypeScript/TSX code.
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Biome Linting & Formatting
+
+This project uses Biome.js (v2) with `recommended` rules plus Next.js and React domains enabled. Reference: `biome.json` at project root.
+
+## Formatting
+
+- **Indent**: tabs (width 2)
+- **Line width**: 100
+- **Quotes**: double quotes
+- **Semicolons**: always
+- **Trailing commas**: ES5 style
+- **Bracket same line**: false
+- **Line endings**: LF
+
+## Key Lint Rules to Follow
+
+Since `recommended: true` is on, all of these apply. Pay special attention to ones the AI commonly violates:
+
+### No array index as key (`suspicious/noArrayIndexKey`)
+Never use the loop index as a React `key` prop. Use a stable identifier, or if the list is static/small (e.g. skeleton loaders), just write out the elements explicitly.
+
+```tsx
+// ❌ BAD
+{items.map((item, i) => <div key={i}>{item}</div>)}
+{Array.from({ length: 4 }).map((_, i) => <div key={`skeleton-${i}`} />)}
+
+// ✅ GOOD — stable ID
+{items.map((item) => <div key={item.id}>{item.name}</div>)}
+
+// ✅ GOOD — small static list, just write it out
+<div className="h-10 rounded bg-muted" />
+<div className="h-10 rounded bg-muted" />
+<div className="h-10 rounded bg-muted" />
+```
+
+### No unused variables/imports (`correctness/noUnusedVariables`, `correctness/noUnusedImports`)
+Don't leave unused imports or variables. Biome auto-organizes imports via `assist.actions.source.organizeImports`.
+
+### No explicit `any` (`suspicious/noExplicitAny`)
+Use proper types instead of `any`. Prefer `unknown` when the type is truly unknown.
+
+### Use `type` imports for type-only usage
+```tsx
+// ✅ GOOD
+import type { Piece } from "@/types/music";
+```
+
+### No `console.log` in production code (`suspicious/noConsole`)
+Use a proper logger or remove debug statements before committing.
+
+### React-specific (domain: react)
+- Always use self-closing tags for void elements: `<div />` not `<div></div>`
+- No direct DOM manipulation — use refs
+- No missing `key` in iterators

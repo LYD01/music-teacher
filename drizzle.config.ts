@@ -1,0 +1,17 @@
+// Drizzle ORM config for Vercel Neon
+// Run: npx drizzle-kit push
+
+import { config } from "dotenv";
+import { defineConfig } from "drizzle-kit";
+
+config({ path: ".env.local" });
+config({ path: "src/.env.local" });
+
+export default defineConfig({
+	schema: "./src/lib/db/schema.ts",
+	out: "./drizzle",
+	dialect: "postgresql",
+	dbCredentials: {
+		url: process.env.POSTGRES_URL ?? process.env.DATABASE_URL ?? "",
+	},
+});
