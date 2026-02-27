@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { PublicNav } from "@/components/layout/PublicNav";
 
 export default function Home() {
 	return (
-		<main className="min-h-screen bg-background">
+		<>
+			<PublicNav />
+			<main className="min-h-screen bg-background">
 			{/* Hero */}
 			<section className="relative overflow-hidden px-6 py-20 sm:px-8 md:py-28 lg:px-12">
 				{/* Subtle background pattern */}
@@ -243,5 +246,6 @@ export default function Home() {
 				</div>
 			</section>
 		</main>
+		</>
 	);
 }

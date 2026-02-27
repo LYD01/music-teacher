@@ -1,17 +1,34 @@
-// App header bar with user info and settings
-// Sits at the top of the (app) layout
+"use client";
+
+import { usePathname } from "next/navigation";
+import { getPageTitle } from "@/lib/nav/breadcrumb";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { UserMenu } from "@/components/layout/UserMenu";
 
 interface HeaderProps {
+	user?: {
+		name?: string | null;
+		email?: string | null;
+		image?: string | null;
+	};
+	role?: "student" | "admin";
 	className?: string;
 }
 
-export function Header({ className = "" }: HeaderProps) {
+export function Header({ user, role = "student", className = "" }: HeaderProps) {
+	const pathname = usePathname();
+	const pageTitle = getPageTitle(pathname);
+
 	return (
-		<header className={`flex h-14 items-center justify-between border-b border-border bg-card px-6 ${className}`}>
-			<div />
-			<div className="flex items-center gap-4">
-				{/* TODO: User avatar, settings dropdown, sign out */}
-				<div className="h-8 w-8 rounded-full bg-muted" />
+		<header
+			className={`flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 ${className}`}
+		>
+			<h2 className="truncate text-base font-semibold text-foreground md:text-lg">
+				{pageTitle}
+			</h2>
+			<div className="flex items-center gap-2">
+				<ThemeToggle />
+				<UserMenu user={user} role={role} />
 			</div>
 		</header>
 	);
