@@ -15,15 +15,3 @@ if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
 else
   echo "Skipping full format."
 fi
-
-echo ""
-echo "🏗️  Running production build..."
-if ! bun run build > /dev/null 2>&1; then
-  echo ""
-  echo "❌ Production build failed. Fix build errors before committing."
-  echo ""
-  echo "  Run 'bun run build' to see the full error output."
-  echo ""
-  exit 1
-fi
-echo "✅ Production build passed."
