@@ -9,7 +9,7 @@ todos:
     content: "Phase 2: OSMD integration, MusicXML parser, piece library with genre filter, piece detail page, intercepting route modal, DB wiring"
     status: completed
   - id: phase3-audio-practice
-    content: "Phase 3: Mic capture, Pitchy pitch detection, note detector, comparison engine, practice page, save sessions + progress to DB"
+    content: "Phase 3: Mic capture (Web Audio API), WASM pitch detection (Rust/wasm-pack, YIN algorithm), note detector, comparison engine, practice page, save sessions + progress to DB"
     status: pending
   - id: phase4-avatar-feedback
     content: "Phase 4: React Three Fiber scene, Mixamo character + animations, animation state machine, Ollama AI feedback, feedback panel"
@@ -34,7 +34,7 @@ isProject: false
 - **Database**: Neon Postgres (hosted on Vercel)
 - **Auth**: Neon Auth (Vercel integration, cookie-based sessions)
 - **Sheet Music**: OpenSheetMusicDisplay (OSMD) rendering MusicXML
-- **Audio**: Web Audio API + WASAM for pitch detection
+- **Audio**: Web Audio API + WASM (Rust/wasm-pack, YIN algorithm) for low-latency pitch detection
 - **3D Avatar**: React Three Fiber + Drei + Mixamo animations
 - **AI Feedback**: Ollama (local) via API route
 - **State**: Zustand (client-side session state only; persistent data goes to DB)
@@ -296,7 +296,7 @@ music-teacher/
 │   ├── _lib/
 │   │   ├── audio/
 │   │   │   ├── capture.ts                  # Mic → MediaStream → AudioWorklet
-│   │   │   ├── pitch-detector.ts           # Pitchy wrapper
+│   │   │   ├── pitch-detector.ts           # WASM pitch detector wrapper (YIN algorithm)
 │   │   │   ├── note-detector.ts            # Onset/offset detection
 │   │   │   └── analyzer.ts                 # Score computation
 │   │   ├── music/
@@ -340,7 +340,8 @@ music-teacher/
 │   │
 │   ├── _hooks/                             # React hooks
 │   │   ├── use-sidebar.tsx
-│   │   └── use-media-query.ts
+│   │   ├── use-media-query.ts
+│   │   └── use-microphone.ts               # Mic capture lifecycle (start/stop/state)
 │   │
 │   └── _data/
 │       └── instruments/                    # Instrument configs
@@ -431,8 +432,8 @@ Each activity row stores a `metadata` JSONB field for flexible data (scores, dur
 
 ### Phase 3: Audio Pipeline + Practice
 
-- Implement mic capture with Web Audio API
-- Integrate Pitchy for pitch detection
+- Implement mic capture with Web Audio API (AudioContext → AnalyserNode pipeline, `useMicrophone` hook)
+- Build WASM pitch detector (Rust/wasm-pack, YIN algorithm compiled to WebAssembly for low-latency detection)
 - Build note onset/offset detector
 - Build performance comparison engine (detected vs expected)
 - Create the practice session page with `AudioControls` and live visualizer
@@ -468,10 +469,64 @@ Each activity row stores a `metadata` JSONB field for flexible data (scores, dur
 
 ---
 
+## WASM Pitch Detection Architecture
+
+```
+Audio Pipeline (mic capture → pitch detection):
+
+  Microphone
+      │
+      ▼
+  getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
+      │
+      ▼
+  AudioContext (44100 Hz)
+      │
+      ▼
+  MediaStreamSourceNode
+      │
+      ▼
+  AnalyserNode (fftSize: 2048)
+      │
+      ▼
+  getFloatTimeDomainData() → Float32Array (called per animation frame)
+      │
+      ▼
+  WASM Pitch Detector (Rust, YIN algorithm)
+      │
+      ▼
+  { frequency: f32, clarity: f32 }
+      │
+      ▼
+  frequencyToNote() → { name, octave, cents }
+      │
+      ▼
+  Note Onset/Offset Detector → DetectedNote[]
+```
+
+**Why WASM over a JS pitch detection library (e.g. Pitchy)?**
+
+- **Lower latency**: YIN algorithm in Rust/WASM runs 3-5x faster than equivalent JS, critical for real-time feedback
+- **Deterministic performance**: No GC pauses during pitch analysis; consistent frame timing
+- **Future-proof**: AudioWorklet + WASM enables off-main-thread processing (Phase 3 optimization)
+- **Precision**: Rust's f32/f64 math compiles to native WASM float ops without JS number coercion edge cases
+
+**WASM module interface** (Rust → wasm-bindgen exports):
+
+```rust
+#[wasm_bindgen]
+pub fn detect_pitch(samples: &[f32], sample_rate: f32, threshold: f32) -> JsValue
+// Returns { frequency: f32, clarity: f32 } or null if no pitch detected
+```
+
+**Build pipeline**: `wasm-pack build --target bundler` → generates ES module imported by `pitch-detector.ts`
+
+---
+
 ## Key Technical Notes
 
 1. **Imports** — All shared code lives in `_`-prefixed folders (`_components`, `_lib`, `_types`, `_hooks`, `_stores`, `_data`, `_utils`, `_constants`, `_interfaces`). Use `@_*` path aliases and barrel files (`index.ts`) for clean imports. See README for details.
-2. **Pitch detection is monophonic only for MVP** -- start with single-note melodies. Chord detection is a much harder problem and can be a future enhancement.
+2. **Pitch detection is monophonic only for MVP** -- start with single-note melodies. Uses a Rust-compiled WASM module implementing the YIN algorithm for sub-millisecond pitch detection. The WASM module is loaded as an ES module via wasm-pack's `bundler` target and invoked from the main thread (AudioWorklet integration is a future optimization). Chord detection is a much harder problem and can be a future enhancement.
 3. **OSMD is a large library (~2MB)** -- dynamically import it only on the practice/piece pages to keep the initial bundle small. Use `next/dynamic` with `ssr: false` since OSMD needs the DOM.
 4. **3D scene isolation** -- render the R3F canvas only on the practice page, lazy-loaded. Run audio analysis in a Web Worker to avoid competing with the Three.js render loop.
 5. **Vercel Postgres driver** -- use `@vercel/postgres` which reads `POSTGRES_URL` from env automatically. Works seamlessly with Vercel's edge runtime.
