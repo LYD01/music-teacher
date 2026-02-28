@@ -11,7 +11,7 @@ import {
 	Input,
 	ScrollWindow,
 	Separator,
-} from "@/components/common";
+} from "@_components";
 
 const colorPalette = [
 	{ name: "Background", token: "--background", class: "bg-background", sample: true },

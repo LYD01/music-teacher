@@ -1,9 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { getPageTitle } from "@/lib/nav/breadcrumb";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { UserMenu } from "@/components/layout/UserMenu";
+import { ThemeToggle, UserMenu } from "@_components/layout";
+import { getPageTitle } from "@_lib";
 
 interface HeaderProps {
 	user?: {

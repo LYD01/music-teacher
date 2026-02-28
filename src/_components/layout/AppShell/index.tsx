@@ -2,11 +2,13 @@
 
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { SidebarProvider } from "@/hooks/use-sidebar";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Header } from "@/components/layout/Header";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
-import { PracticeHeader } from "@/components/layout/PracticeHeader";
+import {
+	Header,
+	MobileBottomNav,
+	PracticeHeader,
+	Sidebar,
+} from "@_components/layout";
+import { SidebarProvider } from "@_hooks";
 
 interface AppShellProps {
 	children: ReactNode;

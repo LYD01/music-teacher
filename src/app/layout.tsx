@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Footer } from "@/components/layout/Footer";
-import { RouteAnnouncer } from "@/components/layout/RouteAnnouncer";
-import { SkipLink } from "@/components/layout/SkipLink";
-import { NeonAuthProvider } from "@/components/providers/NeonAuthProvider";
+import {
+	Footer,
+	NeonAuthProvider,
+	RouteAnnouncer,
+	SkipLink,
+} from "@_components";
 import "./globals.css";
 
 const geistSans = Geist({

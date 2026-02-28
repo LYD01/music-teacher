@@ -1,7 +1,7 @@
 // Mic capture: MediaStream → AudioWorklet pipeline
 // Requests user microphone, creates AudioContext, connects to analyser/worklet
 
-import type { AudioCaptureState } from "@/types/audio";
+import type { AudioCaptureState } from "@_types";
 
 export async function requestMicAccess(): Promise<AudioCaptureState> {
   // TODO: navigator.mediaDevices.getUserMedia({ audio: true })

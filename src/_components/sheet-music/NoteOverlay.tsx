@@ -3,7 +3,7 @@
 // Overlays correct (green) / incorrect (red) indicators on the rendered sheet music
 // Positioned relative to the OSMD SVG output after analysis
 
-import type { ComparisonResult } from "@/lib/music/comparison";
+import type { ComparisonResult } from "@_lib/music/comparison";
 
 interface NoteOverlayProps {
 	results: ComparisonResult[];

@@ -3,7 +3,7 @@
 // Controls avatar animation state based on practice session events
 // Bridges the session store mood → R3F animation crossfade
 
-import type { AvatarMood } from "@/types/feedback";
+import type { AvatarMood } from "@_types";
 
 interface AvatarControllerProps {
 	mood: AvatarMood;

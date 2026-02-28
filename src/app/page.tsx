@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PublicNav } from "@/components/layout/PublicNav";
+import { PublicNav } from "@_components";
 
 export default function Home() {
 	return (

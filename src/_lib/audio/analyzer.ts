@@ -1,8 +1,7 @@
 // Score computation: compares detected notes against expected notes
 // Produces an AccuracyReport with overall, pitch, and rhythm scores
 
-import type { DetectedNote } from "@/types/audio";
-import type { AccuracyReport } from "@/types/feedback";
+import type { AccuracyReport, DetectedNote } from "@_types";
 
 export interface ExpectedNote {
   noteName: string;

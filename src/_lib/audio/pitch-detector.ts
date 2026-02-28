@@ -1,7 +1,7 @@
 // Pitchy wrapper for real-time pitch detection
 // Converts raw audio buffer → frequency + clarity values
 
-import type { PitchDetectionConfig } from "@/types/audio";
+import type { PitchDetectionConfig } from "@_types";
 
 export const DEFAULT_CONFIG: PitchDetectionConfig = {
   sampleRate: 44100,

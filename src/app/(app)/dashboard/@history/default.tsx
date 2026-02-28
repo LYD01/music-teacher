@@ -1,7 +1,7 @@
 // Parallel route: recent activity feed (default slot)
 // Loads independently alongside @progress
 
-import { HistoryFeed } from "@/components/dashboard/HistoryFeed";
+import { HistoryFeed } from "@_components";
 
 export default function HistorySlot() {
 	// TODO: Fetch recent activities from DB

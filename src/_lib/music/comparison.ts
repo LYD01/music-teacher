@@ -1,8 +1,8 @@
 // Detected vs expected note comparison engine
 // Aligns detected notes to expected timeline and flags correct/incorrect/missed
 
-import type { DetectedNote } from "@/types/audio";
-import type { ExpectedNote } from "@/lib/audio/analyzer";
+import type { ExpectedNote } from "@_lib/audio/analyzer";
+import type { DetectedNote } from "@_types";
 
 export interface ComparisonResult {
   noteIndex: number;

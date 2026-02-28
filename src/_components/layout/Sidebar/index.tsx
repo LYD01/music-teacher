@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getNavItemsForRole } from "@/lib/nav/config";
-import { ChevronLeftIcon, ChevronRightIcon } from "@/lib/nav/icons";
-import { useSidebar } from "@/hooks/use-sidebar";
+import {
+	ChevronLeftIcon,
+	ChevronRightIcon,
+	getNavItemsForRole,
+} from "@_lib";
+import { useSidebar } from "@_hooks";
 
 interface SidebarProps {
 	role?: "student" | "admin";

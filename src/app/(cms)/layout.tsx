@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { PublicNav } from "@/components/layout/PublicNav";
+import { PublicNav } from "@_components";
 
 export default function CmsLayout({ children }: { children: ReactNode }) {
 	return (

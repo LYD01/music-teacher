@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getMobileNavItems } from "@/lib/nav/config";
+import { getMobileNavItems } from "@_lib";
 
 interface MobileBottomNavProps {
 	role?: "student" | "admin";

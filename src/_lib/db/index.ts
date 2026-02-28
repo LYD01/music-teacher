@@ -1,5 +1,5 @@
 // Single entry point for database access
-// Import db from "@/lib/db" everywhere
+// Import db from "@_lib/db" everywhere
 
 export { db } from "./client";
 export * from "./schema";

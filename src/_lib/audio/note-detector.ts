@@ -1,7 +1,7 @@
 // Onset/offset detection: converts raw pitch stream into discrete notes
 // Handles debouncing, minimum duration thresholds, and note boundaries
 
-import type { DetectedNote } from "@/types/audio";
+import type { DetectedNote } from "@_types";
 
 export function processNoteStream(
   _pitchHistory: Array<{ frequency: number; time: number; clarity: number }>,

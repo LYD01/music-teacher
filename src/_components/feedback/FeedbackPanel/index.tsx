@@ -1,4 +1,4 @@
-import type { FeedbackResponse } from "@/types/feedback";
+import type { FeedbackResponse } from "@_types";
 
 interface FeedbackPanelProps {
 	feedback: FeedbackResponse | null;

@@ -3,7 +3,7 @@
 // React Three Fiber canvas + scene for the 3D music teacher avatar
 // Lazy-loaded only on the practice page to keep bundle size small
 
-import type { AvatarMood } from "@/types/feedback";
+import type { AvatarMood } from "@_types";
 
 interface AvatarSceneProps {
 	mood: AvatarMood;

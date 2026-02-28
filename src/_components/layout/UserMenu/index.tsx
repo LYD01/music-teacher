@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { authClient } from "@/lib/auth";
-import { LogOutIcon } from "@/lib/nav/icons";
+import { authClient, LogOutIcon } from "@_lib";
 
 interface UserMenuProps {
 	user?: {

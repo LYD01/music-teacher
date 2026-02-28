@@ -1,7 +1,7 @@
 // Progress summary card for the dashboard parallel route
 // Shows mastery level, best score, and session count for a piece
 
-import type { MasteryLevel } from "@/types/music";
+import type { MasteryLevel } from "@_types";
 
 interface ProgressCardProps {
 	pieceTitle: string;

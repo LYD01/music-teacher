@@ -1,7 +1,7 @@
 // MusicXML parser: extracts expected note sequences from .musicxml files
 // Used to build the reference sequence for comparison during practice
 
-import type { ExpectedNote } from "@/lib/audio/analyzer";
+import type { ExpectedNote } from "@_lib/audio/analyzer";
 
 export function parseMusicXML(_xmlContent: string): ExpectedNote[] {
   // TODO: Parse MusicXML DOM, extract <note> elements with pitch/duration

@@ -1,7 +1,7 @@
 // Instrument registry: configs for supported instruments
 // Each instrument defines tuning, note range, and display properties
 
-import type { Instrument } from "@/types/music";
+import type { Instrument } from "@_types";
 
 export const INSTRUMENTS: Record<string, Instrument> = {
   "acoustic-guitar": {

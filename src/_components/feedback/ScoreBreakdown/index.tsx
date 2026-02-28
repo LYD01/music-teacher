@@ -1,4 +1,4 @@
-import type { AccuracyReport } from "@/types/feedback";
+import type { AccuracyReport } from "@_types";
 
 interface ScoreBreakdownProps {
 	report: AccuracyReport | null;

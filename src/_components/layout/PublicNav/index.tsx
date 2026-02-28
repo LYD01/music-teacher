@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { authClient } from "@/lib/auth";
+import { authClient } from "@_lib";
 
 const navLinks = [
 	{ href: "/blog", label: "Blog" },

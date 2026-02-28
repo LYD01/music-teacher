@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MoonIcon, SunIcon } from "@/lib/nav/icons";
+import { MoonIcon, SunIcon } from "@_lib";
 
 const THEME_KEY = "amt-theme";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60;

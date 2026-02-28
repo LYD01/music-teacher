@@ -2,7 +2,7 @@
 // Drives the avatar's emotional response to student performance
 
 import type { AnimationName } from "./animations";
-import type { AvatarMood } from "@/types/feedback";
+import type { AvatarMood } from "@_types";
 
 export function moodToAnimation(mood: AvatarMood): AnimationName {
   const map: Record<AvatarMood, AnimationName> = {

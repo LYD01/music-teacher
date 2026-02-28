@@ -1,7 +1,7 @@
 // Acoustic guitar instrument configuration
 // Used by the instrument registry and audio analysis pipeline
 
-import type { Instrument } from "@/types/music";
+import type { Instrument } from "@_types";
 
 export const acousticGuitar: Instrument = {
   id: "acoustic-guitar",

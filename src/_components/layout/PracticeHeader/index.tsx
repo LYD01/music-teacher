@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ChevronLeftIcon } from "@/lib/nav/icons";
+import { ChevronLeftIcon } from "@_lib";
 
 interface PracticeHeaderProps {
 	pieceTitle?: string;
