@@ -34,7 +34,7 @@ isProject: false
 - **Database**: Neon Postgres (hosted on Vercel)
 - **Auth**: Auth.js v5 (NextAuth) with GitHub OAuth (portfolio-friendly, one-click)
 - **Sheet Music**: OpenSheetMusicDisplay (OSMD) rendering MusicXML
-- **Audio**: Web Audio API + Pitchy (pitch detection)
+- **Audio**: Web Audio API + WASAM for pitch detection
 - **3D Avatar**: React Three Fiber + Drei + Mixamo animations
 - **AI Feedback**: Ollama (local) via API route
 - **State**: Zustand (client-side session state only; persistent data goes to DB)

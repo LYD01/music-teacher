@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# local notes
+local-quick-notes.md
+
 .env.local
 .env.dev
 .env.uat
