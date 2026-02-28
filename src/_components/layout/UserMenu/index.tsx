@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient, LogOutIcon } from "@_lib";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -58,13 +59,13 @@ export function UserMenu({ user, role = "student" }: UserMenuProps) {
 				ref={triggerRef}
 				type="button"
 				onClick={() => setOpen((prev) => !prev)}
-				className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-border bg-muted text-sm font-medium text-foreground transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+				className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-border bg-muted text-sm font-medium text-foreground transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 				aria-expanded={open}
 				aria-haspopup="true"
 				aria-label="Open user menu"
 			>
 				{user?.image ? (
-					<img src={user.image} alt="" className="h-full w-full rounded-full object-cover" />
+					<Image src={user.image} alt="" fill className="rounded-full object-cover" />
 				) : (
 					<span>{initials}</span>
 				)}

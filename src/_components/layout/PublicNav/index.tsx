@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@_lib";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -21,12 +22,8 @@ function UserAvatar({ name, image }: { name: string; image?: string | null }) {
 		.toUpperCase();
 
 	return (
-		<span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-muted text-xs font-medium text-foreground">
-			{image ? (
-				<img src={image} alt="" className="h-full w-full rounded-full object-cover" />
-			) : (
-				initials
-			)}
+		<span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-2 border-border bg-muted text-xs font-medium text-foreground">
+			{image ? <Image src={image} alt="" fill className="rounded-full object-cover" /> : initials}
 		</span>
 	);
 }
@@ -216,18 +213,16 @@ export function PublicNav() {
 					})}
 					<div className="my-3 h-px bg-border" />
 					{isSignedIn ? (
-						<>
-							<Link
-								href="/dashboard"
-								className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-							>
-								<UserAvatar
-									name={session.user.name || session.user.email}
-									image={session.user.image}
-								/>
-								<span>Dashboard</span>
-							</Link>
-						</>
+						<Link
+							href="/dashboard"
+							className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+						>
+							<UserAvatar
+								name={session.user.name || session.user.email}
+								image={session.user.image}
+							/>
+							<span>Dashboard</span>
+						</Link>
 					) : (
 						<>
 							<Link

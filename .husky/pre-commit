@@ -9,7 +9,7 @@ read -r answer
 
 if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
   echo "Formatting src/..."
-  bunx biome check --write src/
+  bunx biome check --write --unsafe src/
   git add src/
   echo "✅ src/ formatted and staged."
 else
