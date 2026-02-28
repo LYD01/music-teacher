@@ -1,4 +1,10 @@
+export type { UseComparisonReturn } from "./use-comparison";
+export { useComparison } from "./use-comparison";
 export { useMediaQuery } from "./use-media-query";
 export type { UseMicrophoneReturn } from "./use-microphone";
 export { useMicrophone } from "./use-microphone";
+export type { UseNoteDetectionReturn } from "./use-note-detection";
+export { useNoteDetection } from "./use-note-detection";
+export type { PitchInfo } from "./use-pitch-detection";
+export { usePitchDetection } from "./use-pitch-detection";
 export { SidebarProvider, useSidebar } from "./use-sidebar";

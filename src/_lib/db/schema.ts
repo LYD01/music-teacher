@@ -85,19 +85,23 @@ export const practiceSessions = pgTable("practice_sessions", {
 	detectedNotes: jsonb("detected_notes"),
 });
 
-export const userPieceProgress = pgTable("user_piece_progress", {
-	userId: uuid("user_id")
-		.notNull()
-		.references(() => users.id),
-	pieceId: uuid("piece_id")
-		.notNull()
-		.references(() => pieces.id),
-	bestScore: real("best_score"),
-	avgScore: real("avg_score"),
-	totalSessions: integer("total_sessions").default(0),
-	masteryLevel: text("mastery_level"),
-	lastPracticed: timestamp("last_practiced"),
-});
+export const userPieceProgress = pgTable(
+	"user_piece_progress",
+	{
+		userId: uuid("user_id")
+			.notNull()
+			.references(() => users.id),
+		pieceId: uuid("piece_id")
+			.notNull()
+			.references(() => pieces.id),
+		bestScore: real("best_score"),
+		avgScore: real("avg_score"),
+		totalSessions: integer("total_sessions").default(0),
+		masteryLevel: text("mastery_level"),
+		lastPracticed: timestamp("last_practiced"),
+	},
+	(t) => [primaryKey({ columns: [t.userId, t.pieceId] })]
+);
 
 export const activityLog = pgTable("activity_log", {
 	id: uuid("id").primaryKey().defaultRandom(),

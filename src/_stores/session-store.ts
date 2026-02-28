@@ -1,7 +1,5 @@
-// Live practice session state (Zustand)
-// Tracks current session: playing status, detected notes, elapsed time, scores
-
 import type { AccuracyReport, DetectedNote } from "@_types";
+import { create } from "zustand";
 
 export interface SessionState {
 	isActive: boolean;
@@ -20,5 +18,44 @@ export interface SessionState {
 	reset: () => void;
 }
 
-// TODO: export const useSessionStore = create<SessionState>((set) => ({ ... }));
-void ({} as SessionState);
+export const useSessionStore = create<SessionState>((set) => ({
+	isActive: false,
+	isPaused: false,
+	currentPieceId: null,
+	elapsedTime: 0,
+	detectedNotes: [],
+	currentReport: null,
+
+	startSession: (pieceId) =>
+		set({
+			isActive: true,
+			isPaused: false,
+			currentPieceId: pieceId,
+			elapsedTime: 0,
+			detectedNotes: [],
+			currentReport: null,
+		}),
+
+	pauseSession: () => set({ isPaused: true }),
+
+	resumeSession: () => set({ isPaused: false }),
+
+	endSession: () => set({ isActive: false, isPaused: false }),
+
+	addDetectedNote: (note) =>
+		set((state) => ({
+			detectedNotes: [...state.detectedNotes, note],
+		})),
+
+	setReport: (report) => set({ currentReport: report }),
+
+	reset: () =>
+		set({
+			isActive: false,
+			isPaused: false,
+			currentPieceId: null,
+			elapsedTime: 0,
+			detectedNotes: [],
+			currentReport: null,
+		}),
+}));

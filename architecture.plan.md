@@ -432,13 +432,13 @@ Each activity row stores a `metadata` JSONB field for flexible data (scores, dur
 
 ### Phase 3: Audio Pipeline + Practice
 
-- Implement mic capture with Web Audio API (AudioContext → AnalyserNode pipeline, `useMicrophone` hook)
-- Build WASM pitch detector (Rust/wasm-pack, YIN algorithm compiled to WebAssembly for low-latency detection)
-- Build note onset/offset detector
-- Build performance comparison engine (detected vs expected)
-- Create the practice session page with `AudioControls` and live visualizer
-- Save practice sessions to DB
-- Update `user_piece_progress` after each session
+- ~~Implement mic capture with Web Audio API (AudioContext → AnalyserNode pipeline, `useMicrophone` hook)~~ ✅
+- ~~Build WASM pitch detector (Rust/wasm-pack YIN algorithm, JS fallback, `PitchDetector` class, `usePitchDetection` hook, live `PitchDisplay` tuning meter)~~ ✅
+- ~~Build note onset/offset detector (`NoteDetector` state machine, `useNoteDetection` hook, note log UI)~~ ✅
+- ~~Build performance comparison engine (detected vs expected)~~ ✅
+- ~~Create the practice session page with `AudioControls` and live visualizer~~ ✅
+- ~~Save practice sessions to DB~~ ✅
+- ~~Update `user_piece_progress` after each session~~ ✅
 
 ### Phase 4: 3D Avatar + Feedback
 
