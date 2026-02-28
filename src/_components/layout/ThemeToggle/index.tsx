@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { MoonIcon, SunIcon } from "@_lib";
+import { useEffect, useState } from "react";
 
 const THEME_KEY = "amt-theme";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
@@ -71,11 +71,7 @@ export function ThemeToggle() {
 			aria-label={label}
 			title={label}
 		>
-			{theme === "dark" ? (
-				<MoonIcon className="text-foreground" />
-			) : (
-				<SunIcon />
-			)}
+			{theme === "dark" ? <MoonIcon className="text-foreground" /> : <SunIcon />}
 		</button>
 	);
 }

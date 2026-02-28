@@ -1,13 +1,9 @@
 "use client";
 
+import { useSidebar } from "@_hooks";
+import { ChevronLeftIcon, ChevronRightIcon, getNavItemsForRole } from "@_lib";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	getNavItemsForRole,
-} from "@_lib";
-import { useSidebar } from "@_hooks";
 
 interface SidebarProps {
 	role?: "student" | "admin";
@@ -33,10 +29,7 @@ export function Sidebar({ role = "student", className = "" }: SidebarProps) {
 		>
 			{/* Logo */}
 			<div className="flex h-14 shrink-0 items-center gap-3 border-b border-border px-3">
-				<Link
-					href="/dashboard"
-					className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden"
-				>
+				<Link href="/dashboard" className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden">
 					<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
 						<svg
 							className="h-5 w-5 text-primary"
@@ -54,9 +47,7 @@ export function Sidebar({ role = "student", className = "" }: SidebarProps) {
 						</svg>
 					</span>
 					{!collapsed && (
-						<span className="truncate text-lg font-bold text-foreground">
-							Music Teacher
-						</span>
+						<span className="truncate text-lg font-bold text-foreground">Music Teacher</span>
 					)}
 				</Link>
 			</div>
@@ -86,8 +77,7 @@ export function Sidebar({ role = "student", className = "" }: SidebarProps) {
 					<>
 						<div className="my-2 h-px bg-border" aria-hidden />
 						{adminItems.map(({ href, label, icon: Icon }) => {
-							const isActive =
-								pathname === href || pathname?.startsWith(`${href}/`);
+							const isActive = pathname === href || pathname?.startsWith(`${href}/`);
 							return (
 								<Link
 									key={href}
@@ -107,8 +97,7 @@ export function Sidebar({ role = "student", className = "" }: SidebarProps) {
 					<>
 						<div className="my-2 h-px bg-border" aria-hidden />
 						{bottomItems.map(({ href, label, icon: Icon }) => {
-							const isActive =
-								pathname === href || pathname?.startsWith(`${href}/`);
+							const isActive = pathname === href || pathname?.startsWith(`${href}/`);
 							return (
 								<Link
 									key={href}

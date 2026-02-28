@@ -1,8 +1,8 @@
 "use client";
 
+import { getMobileNavItems } from "@_lib";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getMobileNavItems } from "@_lib";
 
 interface MobileBottomNavProps {
 	role?: "student" | "admin";
@@ -26,16 +26,10 @@ export function MobileBottomNav({ role = "student" }: MobileBottomNavProps) {
 						aria-current={isActive ? "page" : undefined}
 						aria-label={label}
 						className={`flex flex-col items-center gap-1 rounded-lg px-4 py-2 transition-colors ${
-							isActive
-								? "text-primary"
-								: "text-muted-foreground hover:text-foreground"
+							isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
 						}`}
 					>
-						<Icon
-							className="h-6 w-6"
-							aria-hidden
-							strokeWidth={isActive ? 2.5 : 2}
-						/>
+						<Icon className="h-6 w-6" aria-hidden strokeWidth={isActive ? 2.5 : 2} />
 						<span className="text-xs font-medium">{label}</span>
 					</Link>
 				);

@@ -39,11 +39,7 @@ export function RouteAnnouncer() {
 	}, [pathname]);
 
 	return (
-		<output
-			aria-live="polite"
-			aria-atomic="true"
-			className="sr-only"
-		>
+		<output aria-live="polite" aria-atomic="true" className="sr-only">
 			{announcement}
 		</output>
 	);

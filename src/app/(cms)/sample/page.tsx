@@ -212,14 +212,11 @@ export default function SamplePage() {
 							<ScrollWindow className="p-4">
 								<div className="space-y-4">
 									{[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-										<div
-											key={i}
-											className="rounded-lg border border-border bg-muted/50 p-4"
-										>
+										<div key={i} className="rounded-lg border border-border bg-muted/50 p-4">
 											<p className="font-medium">Item {i}</p>
 											<p className="text-sm text-muted-foreground">
-												Scroll down to see more content. The scrollbar thumb has a
-												gradient from primary to accent.
+												Scroll down to see more content. The scrollbar thumb has a gradient from
+												primary to accent.
 											</p>
 										</div>
 									))}
@@ -227,26 +224,16 @@ export default function SamplePage() {
 							</ScrollWindow>
 						</div>
 						<div>
-							<p className="mb-2 text-sm text-muted-foreground">
-								Custom gradient (teal → amber):
-							</p>
-							<ScrollWindow
-								gradientFrom="#0d9488"
-								gradientTo="#f59e0b"
-								className="p-4"
-							>
+							<p className="mb-2 text-sm text-muted-foreground">Custom gradient (teal → amber):</p>
+							<ScrollWindow gradientFrom="#0d9488" gradientTo="#f59e0b" className="p-4">
 								<div className="space-y-3">
 									{["C", "D", "E", "F", "G", "A", "B"].map((note) => (
 										<div
 											key={note}
 											className="flex items-center gap-3 rounded-md bg-muted/30 px-3 py-2"
 										>
-											<span className="font-mono font-semibold text-primary">
-												{note}
-											</span>
-											<span className="text-sm text-muted-foreground">
-												Musical note
-											</span>
+											<span className="font-mono font-semibold text-primary">{note}</span>
+											<span className="text-sm text-muted-foreground">Musical note</span>
 										</div>
 									))}
 								</div>

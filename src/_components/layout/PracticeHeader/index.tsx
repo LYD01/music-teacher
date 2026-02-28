@@ -1,8 +1,8 @@
 "use client";
 
+import { ChevronLeftIcon } from "@_lib";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ChevronLeftIcon } from "@_lib";
 
 interface PracticeHeaderProps {
 	pieceTitle?: string;
@@ -22,9 +22,7 @@ export function PracticeHeader({ pieceTitle = "Practice" }: PracticeHeaderProps)
 				<ChevronLeftIcon className="h-5 w-5" aria-hidden />
 				<span>Exit</span>
 			</Link>
-			<h1 className="truncate text-sm font-semibold text-foreground">
-				{pieceTitle}
-			</h1>
+			<h1 className="truncate text-sm font-semibold text-foreground">{pieceTitle}</h1>
 			<div className="w-14" aria-hidden />
 		</header>
 	);

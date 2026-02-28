@@ -1,13 +1,6 @@
 "use client";
 
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useState,
-	type ReactNode,
-} from "react";
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
 const SIDEBAR_STORAGE_KEY = "amt-sidebar-collapsed";
 
@@ -51,9 +44,7 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	return (
-		<SidebarContext.Provider value={{ collapsed, toggle }}>
-			{children}
-		</SidebarContext.Provider>
+		<SidebarContext.Provider value={{ collapsed, toggle }}>{children}</SidebarContext.Provider>
 	);
 }
 

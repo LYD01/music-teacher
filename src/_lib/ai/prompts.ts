@@ -8,13 +8,13 @@ Keep responses concise (2-3 sentences) and always include one specific
 actionable suggestion.`;
 
 export function buildFeedbackPrompt(_sessionData: {
-  pieceName: string;
-  overallScore: number;
-  pitchAccuracy: number;
-  rhythmAccuracy: number;
-  notesHit: number;
-  totalNotes: number;
+	pieceName: string;
+	overallScore: number;
+	pitchAccuracy: number;
+	rhythmAccuracy: number;
+	notesHit: number;
+	totalNotes: number;
 }): string {
-  // TODO: Format session data into a prompt for Ollama
-  throw new Error("Not implemented");
+	// TODO: Format session data into a prompt for Ollama
+	throw new Error("Not implemented");
 }

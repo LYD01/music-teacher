@@ -125,19 +125,11 @@ body {
 }
 
 .scroll-window::-webkit-scrollbar-thumb {
-	background: linear-gradient(
-		180deg,
-		var(--scroll-gradient-from),
-		var(--scroll-gradient-to)
-	);
+	background: linear-gradient(180deg, var(--scroll-gradient-from), var(--scroll-gradient-to));
 	border-radius: 10px;
 	border: 2px solid var(--card);
 }
 
 .scroll-window::-webkit-scrollbar-thumb:hover {
-	background: linear-gradient(
-		180deg,
-		var(--scroll-gradient-to),
-		var(--scroll-gradient-from)
-	);
+	background: linear-gradient(180deg, var(--scroll-gradient-to), var(--scroll-gradient-from));
 }

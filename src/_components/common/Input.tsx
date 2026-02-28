@@ -11,10 +11,7 @@ export function Input({ label, error, className = "", id, ...props }: InputProps
 	return (
 		<div className="space-y-2">
 			{label && (
-				<label
-					htmlFor={inputId}
-					className="block text-sm font-medium text-foreground"
-				>
+				<label htmlFor={inputId} className="block text-sm font-medium text-foreground">
 					{label}
 				</label>
 			)}

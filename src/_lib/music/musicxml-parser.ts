@@ -4,11 +4,11 @@
 import type { ExpectedNote } from "@_lib/audio/analyzer";
 
 export function parseMusicXML(_xmlContent: string): ExpectedNote[] {
-  // TODO: Parse MusicXML DOM, extract <note> elements with pitch/duration
-  throw new Error("Not implemented");
+	// TODO: Parse MusicXML DOM, extract <note> elements with pitch/duration
+	throw new Error("Not implemented");
 }
 
 export async function loadMusicXMLFile(_path: string): Promise<string> {
-  // TODO: Fetch the .musicxml file content as text
-  throw new Error("Not implemented");
+	// TODO: Fetch the .musicxml file content as text
+	throw new Error("Not implemented");
 }

@@ -4,8 +4,8 @@
 import type { DetectedNote } from "@_types";
 
 export function processNoteStream(
-  _pitchHistory: Array<{ frequency: number; time: number; clarity: number }>,
+	_pitchHistory: Array<{ frequency: number; time: number; clarity: number }>
 ): DetectedNote[] {
-  // TODO: Group consecutive similar pitches into discrete notes
-  throw new Error("Not implemented");
+	// TODO: Group consecutive similar pitches into discrete notes
+	throw new Error("Not implemented");
 }

@@ -1,12 +1,7 @@
+import { Footer, NeonAuthProvider, RouteAnnouncer, SkipLink } from "@_components";
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
-import {
-	Footer,
-	NeonAuthProvider,
-	RouteAnnouncer,
-	SkipLink,
-} from "@_components";
+import { cookies } from "next/headers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,8 +26,7 @@ export default async function RootLayout({
 }>) {
 	const cookieStore = await cookies();
 	const theme = cookieStore.get("amt-theme")?.value;
-	const themeClass =
-		theme === "dark" ? "dark" : theme === "light" ? "light" : undefined;
+	const themeClass = theme === "dark" ? "dark" : theme === "light" ? "light" : undefined;
 
 	return (
 		<html lang="en" className={themeClass} suppressHydrationWarning>

@@ -1,8 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { ThemeToggle, UserMenu } from "@_components/layout";
 import { getPageTitle } from "@_lib";
+import { usePathname } from "next/navigation";
 
 interface HeaderProps {
 	user?: {
@@ -22,9 +22,7 @@ export function Header({ user, role = "student", className = "" }: HeaderProps) 
 		<header
 			className={`flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 ${className}`}
 		>
-			<h2 className="truncate text-base font-semibold text-foreground md:text-lg">
-				{pageTitle}
-			</h2>
+			<h2 className="truncate text-base font-semibold text-foreground md:text-lg">{pageTitle}</h2>
 			<div className="flex items-center gap-2">
 				<ThemeToggle />
 				<UserMenu user={user} role={role} />

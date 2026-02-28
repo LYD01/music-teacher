@@ -1,9 +1,9 @@
 "use client";
 
+import { authClient, LogOutIcon } from "@_lib";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { authClient, LogOutIcon } from "@_lib";
 
 interface UserMenuProps {
 	user?: {
@@ -64,11 +64,7 @@ export function UserMenu({ user, role = "student" }: UserMenuProps) {
 				aria-label="Open user menu"
 			>
 				{user?.image ? (
-					<img
-						src={user.image}
-						alt=""
-						className="h-full w-full rounded-full object-cover"
-					/>
+					<img src={user.image} alt="" className="h-full w-full rounded-full object-cover" />
 				) : (
 					<span>{initials}</span>
 				)}
@@ -80,14 +76,8 @@ export function UserMenu({ user, role = "student" }: UserMenuProps) {
 					role="menu"
 				>
 					<div className="border-b border-border px-4 py-3">
-						<p className="truncate text-sm font-medium text-foreground">
-							{displayName}
-						</p>
-						{user?.email && (
-							<p className="truncate text-xs text-muted-foreground">
-								{user.email}
-							</p>
-						)}
+						<p className="truncate text-sm font-medium text-foreground">{displayName}</p>
+						{user?.email && <p className="truncate text-xs text-muted-foreground">{user.email}</p>}
 					</div>
 					<div className="py-1">
 						<Link

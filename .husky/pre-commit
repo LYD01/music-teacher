@@ -1,1 +1,17 @@
+echo ""
+echo "🔍 Running Biome check on staged files..."
 bunx lint-staged
+
+echo ""
+printf "🧹 Format the entire src/ directory before committing? (y/N) "
+exec < /dev/tty
+read -r answer
+
+if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+  echo "Formatting src/..."
+  bunx biome check --write src/
+  git add src/
+  echo "✅ src/ formatted and staged."
+else
+  echo "Skipping full format."
+fi

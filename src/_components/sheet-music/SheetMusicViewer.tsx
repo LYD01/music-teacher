@@ -10,7 +10,11 @@ interface SheetMusicViewerProps {
 	className?: string;
 }
 
-export function SheetMusicViewer({ musicxmlPath, highlightMeasure, className = "" }: SheetMusicViewerProps) {
+export function SheetMusicViewer({
+	musicxmlPath,
+	highlightMeasure,
+	className = "",
+}: SheetMusicViewerProps) {
 	void musicxmlPath;
 	void highlightMeasure;
 

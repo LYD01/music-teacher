@@ -11,7 +11,13 @@ interface ProgressCardProps {
 	className?: string;
 }
 
-export function ProgressCard({ pieceTitle, masteryLevel, bestScore, totalSessions, className = "" }: ProgressCardProps) {
+export function ProgressCard({
+	pieceTitle,
+	masteryLevel,
+	bestScore,
+	totalSessions,
+	className = "",
+}: ProgressCardProps) {
 	return (
 		<div className={`rounded-lg border border-border bg-card p-4 ${className}`}>
 			<h4 className="font-medium text-foreground">{pieceTitle}</h4>

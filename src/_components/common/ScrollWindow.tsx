@@ -17,8 +17,7 @@ export function ScrollWindow({
 	style,
 	...props
 }: ScrollWindowProps) {
-	const maxHeightValue =
-		typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight;
+	const maxHeightValue = typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight;
 
 	return (
 		<div

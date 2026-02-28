@@ -1,14 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { usePathname } from "next/navigation";
-import {
-	Header,
-	MobileBottomNav,
-	PracticeHeader,
-	Sidebar,
-} from "@_components/layout";
+import { Header, MobileBottomNav, PracticeHeader, Sidebar } from "@_components/layout";
 import { SidebarProvider } from "@_hooks";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 
 interface AppShellProps {
 	children: ReactNode;
@@ -32,10 +27,7 @@ function AppShellInner({ children, user, role = "student" }: AppShellProps) {
 		return (
 			<div className="flex h-screen flex-col">
 				<PracticeHeader pieceTitle="Practice Session" />
-				<main
-					id="main-content"
-					className="flex-1 overflow-y-auto p-4 md:p-6"
-				>
+				<main id="main-content" className="flex-1 overflow-y-auto p-4 md:p-6">
 					{children}
 				</main>
 			</div>
@@ -47,10 +39,7 @@ function AppShellInner({ children, user, role = "student" }: AppShellProps) {
 			<Sidebar role={role} />
 			<div className="flex flex-1 flex-col overflow-hidden">
 				<Header user={user} role={role} />
-				<main
-					id="main-content"
-					className="flex-1 overflow-y-auto p-4 pb-20 md:pb-6 md:pt-6"
-				>
+				<main id="main-content" className="flex-1 overflow-y-auto p-4 pb-20 md:pb-6 md:pt-6">
 					{children}
 				</main>
 			</div>

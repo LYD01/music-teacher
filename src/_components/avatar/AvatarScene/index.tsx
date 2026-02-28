@@ -14,8 +14,12 @@ export function AvatarScene({ mood, className = "" }: AvatarSceneProps) {
 	void mood;
 
 	return (
-		<div className={`flex items-center justify-center rounded-lg border border-border bg-card ${className}`}>
-			<p className="p-8 text-sm text-muted-foreground">3D Avatar scene placeholder — R3F integration pending</p>
+		<div
+			className={`flex items-center justify-center rounded-lg border border-border bg-card ${className}`}
+		>
+			<p className="p-8 text-sm text-muted-foreground">
+				3D Avatar scene placeholder — R3F integration pending
+			</p>
 		</div>
 	);
 }

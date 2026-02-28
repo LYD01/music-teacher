@@ -6,7 +6,9 @@ export default function HistoryPage() {
 	return (
 		<div>
 			<h1 className="text-2xl font-bold text-foreground">Practice History</h1>
-			<p className="mt-1 text-sm text-muted-foreground">Review all your past practice sessions and milestones.</p>
+			<p className="mt-1 text-sm text-muted-foreground">
+				Review all your past practice sessions and milestones.
+			</p>
 
 			<div className="mt-6">
 				{/* TODO: Render paginated history list with filters */}

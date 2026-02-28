@@ -1,11 +1,5 @@
+import { ClockIcon, FolderIcon, GearIcon, HomeIcon, MusicIcon } from "./icons";
 import type { NavItem } from "./types";
-import {
-	ClockIcon,
-	FolderIcon,
-	GearIcon,
-	HomeIcon,
-	MusicIcon,
-} from "./icons";
 
 export const navItems: NavItem[] = [
 	{
@@ -55,7 +49,5 @@ export function getNavItemsForRole(role: "student" | "admin"): NavItem[] {
 }
 
 export function getMobileNavItems(role: "student" | "admin"): NavItem[] {
-	return navItems.filter(
-		(item) => item.roles.includes(role) && item.showOnMobile,
-	);
+	return navItems.filter((item) => item.roles.includes(role) && item.showOnMobile);
 }
