@@ -1,7 +1,7 @@
 "use client";
 
 import { useSidebar } from "@_hooks";
-import { ChevronLeftIcon, ChevronRightIcon, getNavItemsForRole } from "@_lib";
+import { ChevronLeftIcon, ChevronRightIcon, getNavItemsForRole } from "@_lib/client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

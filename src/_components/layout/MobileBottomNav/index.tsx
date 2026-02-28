@@ -1,6 +1,6 @@
 "use client";
 
-import { getMobileNavItems } from "@_lib";
+import { getMobileNavItems } from "@_lib/client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

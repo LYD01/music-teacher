@@ -1,6 +1,6 @@
 "use client";
 
-import { MoonIcon, SunIcon } from "@_lib";
+import { MoonIcon, SunIcon } from "@_lib/client";
 import { useEffect, useState } from "react";
 
 const THEME_KEY = "amt-theme";

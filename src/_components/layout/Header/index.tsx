@@ -1,7 +1,7 @@
 "use client";
 
 import { ThemeToggle, UserMenu } from "@_components/layout";
-import { getPageTitle } from "@_lib";
+import { getPageTitle } from "@_lib/client";
 import { usePathname } from "next/navigation";
 
 interface HeaderProps {

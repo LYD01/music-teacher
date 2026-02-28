@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeftIcon } from "@_lib";
+import { ChevronLeftIcon } from "@_lib/client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
