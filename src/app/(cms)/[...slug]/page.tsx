@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { cmsComponents } from "../components";
+import { cmsComponents } from "../_components";
 
 type PageProps = {
 	params: Promise<{ slug: string[] }>;
