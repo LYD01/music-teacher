@@ -5,5 +5,7 @@ export const auth = createNeonAuth({
 	baseUrl: env.neonAuthBaseUrl,
 	cookies: {
 		secret: env.neonAuthCookieSecret,
+		// Re-validate session with auth server every 24 hours
+		sessionDataTtl: 24 * 60 * 60, // 24 hours in seconds
 	},
 });
