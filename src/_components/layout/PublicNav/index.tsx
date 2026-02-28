@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient } from "@_lib";
+import { authClient } from "@_lib/client";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

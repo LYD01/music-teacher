@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient, LogOutIcon } from "@_lib";
+import { authClient, LogOutIcon } from "@_lib/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

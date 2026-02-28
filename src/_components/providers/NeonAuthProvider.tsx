@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient } from "@_lib";
+import { authClient } from "@_lib/client";
 import { NeonAuthUIProvider } from "@neondatabase/neon-js/auth/react";
 import type { ReactNode } from "react";
 
