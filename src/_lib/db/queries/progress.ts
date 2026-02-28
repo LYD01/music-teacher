@@ -1,6 +1,6 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "../client";
-import { userPieceProgress } from "../schema";
+import { pieces, userPieceProgress } from "../schema";
 
 function computeMasteryLevel(totalSessions: number, avgScore: number): string {
 	if (totalSessions <= 3) return "learning";
@@ -20,6 +20,30 @@ export async function getProgressForPiece(userId: string, pieceId: string) {
 
 export async function getProgressByUser(userId: string) {
 	return db.select().from(userPieceProgress).where(eq(userPieceProgress.userId, userId));
+}
+
+/**
+ * Returns top N pieces by best score for a user, with piece details.
+ * Excludes pieces with no bestScore.
+ */
+export async function getTopScoresByUser(userId: string, limit = 3) {
+	const rows = await db
+		.select({
+			pieceId: userPieceProgress.pieceId,
+			bestScore: userPieceProgress.bestScore,
+			avgScore: userPieceProgress.avgScore,
+			totalSessions: userPieceProgress.totalSessions,
+			masteryLevel: userPieceProgress.masteryLevel,
+			lastPracticed: userPieceProgress.lastPracticed,
+			pieceTitle: pieces.title,
+			pieceComposer: pieces.composer,
+		})
+		.from(userPieceProgress)
+		.innerJoin(pieces, eq(userPieceProgress.pieceId, pieces.id))
+		.where(eq(userPieceProgress.userId, userId))
+		.orderBy(desc(userPieceProgress.bestScore))
+		.limit(limit);
+	return rows.filter((r) => r.bestScore != null);
 }
 
 /**

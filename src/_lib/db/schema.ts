@@ -13,13 +13,6 @@ import {
 	uuid,
 } from "drizzle-orm/pg-core";
 
-// Test table — remove after verifying drizzle-kit push works
-export const testTable = pgTable("test_table", {
-	id: uuid("id").primaryKey().defaultRandom(),
-	message: text("message").notNull(),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
 export const users = pgTable("users", {
 	id: uuid("id").primaryKey().defaultRandom(),
 	email: text("email").notNull().unique(),

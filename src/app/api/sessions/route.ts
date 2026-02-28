@@ -2,7 +2,7 @@ import { auth } from "@_lib/auth-server";
 import { db } from "@_lib/db";
 import { logActivity } from "@_lib/db/queries/activity";
 import { updateProgressAfterSession } from "@_lib/db/queries/progress";
-import { createSession } from "@_lib/db/queries/sessions";
+import { createSession, getRecentSessions, getSessionsByPiece } from "@_lib/db/queries/sessions";
 import { users } from "@_lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
@@ -30,6 +30,23 @@ async function ensureUser(user: {
 			image: user.image ?? null,
 		})
 		.onConflictDoNothing();
+}
+
+export async function GET(request: Request) {
+	const { data: session } = await auth.getSession();
+	if (!session?.user?.id) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	const { searchParams } = new URL(request.url);
+	const pieceId = searchParams.get("pieceId");
+	const limit = Math.min(parseInt(searchParams.get("limit") ?? "10", 10), 50);
+
+	const sessions = pieceId
+		? await getSessionsByPiece(session.user.id, pieceId)
+		: await getRecentSessions(session.user.id, limit);
+
+	return NextResponse.json(sessions);
 }
 
 export async function POST(request: Request) {
