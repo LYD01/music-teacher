@@ -1,5 +1,5 @@
 import { AppShell } from "@_components";
-import { auth } from "@_lib";
+import { auth } from "@_lib/auth-server";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
