@@ -208,7 +208,7 @@ erDiagram
 **MVP approach: Bundled MusicXML files rendered by OSMD**
 
 1. Source 5-8 beginner classical guitar pieces from public domain (IMSLP) or create them in [MuseScore](https://musescore.org) (free, exports MusicXML)
-2. Store `.musicxml` files in `src/data/pieces/` and seed piece metadata to Neon DB
+2. Store `.musicxml` files in `src/_data/pieces/` and seed piece metadata to Neon DB
 3. OSMD renders them in the browser with full notation, key signatures, time signatures
 4. During practice: OSMD API highlights the current measure
 5. After analysis: overlay correct (green) / incorrect (red) notes on the score
@@ -247,7 +247,7 @@ music-teacher/
 ├── src/
 │   ├── app/                                # (see App Router section above)
 │   │
-│   ├── components/                         # All hand-built, no UI library
+│   ├── _components/                        # All hand-built, no UI library
 │   │   ├── common/                         # Button, Input, Card, Modal, etc.
 │   │   │   ├── Button.tsx
 │   │   │   ├── Modal.tsx
@@ -273,7 +273,7 @@ music-teacher/
 │   │       ├── Header/
 │   │       └── AppShell/
 │   │
-│   ├── lib/
+│   ├── _lib/
 │   │   ├── audio/
 │   │   │   ├── capture.ts                  # Mic → MediaStream → AudioWorklet
 │   │   │   ├── pitch-detector.ts           # Pitchy wrapper
@@ -300,18 +300,30 @@ music-teacher/
 │   │       │   └── activity.ts             # Activity log queries
 │   │       └── seed.ts                     # Seed pieces + collections
 │   │
-│   ├── stores/
+│   ├── _stores/
 │   │   ├── session-store.ts                # Live practice session state (Zustand)
 │   │   └── settings-store.ts               # User prefs (instrument, theme)
 │   │
-│   ├── types/
+│   ├── _types/
 │   │   ├── music.ts                        # Instrument, Piece, Collection
 │   │   ├── audio.ts                        # DetectedNote, PitchDetectionConfig
 │   │   └── feedback.ts                     # AccuracyReport, FeedbackResponse
 │   │
+│   ├── _interfaces/                        # Shared interfaces (API contracts)
+│   │   └── index.ts
 │   │
-│   └── data/
-│       ├── instruments/
+│   ├── _utils/                             # Pure helper functions
+│   │   └── index.ts
+│   │
+│   ├── _constants/                         # App constants, config values
+│   │   └── index.ts
+│   │
+│   ├── _hooks/                             # React hooks
+│   │   ├── use-sidebar.tsx
+│   │   └── use-media-query.ts
+│   │
+│   └── _data/
+│       ├── instruments/                    # Instrument configs
 │       │   └── acoustic-guitar.ts          # Guitar config
 │       └── pieces/                         # Bundled MusicXML files
 │           ├── ode-to-joy.musicxml
@@ -429,10 +441,11 @@ Each activity row stores a `metadata` JSONB field for flexible data (scores, dur
 
 ## Key Technical Notes
 
-1. **Pitch detection is monophonic only for MVP** -- start with single-note melodies. Chord detection is a much harder problem and can be a future enhancement.
-2. **OSMD is a large library (~2MB)** -- dynamically import it only on the practice/piece pages to keep the initial bundle small. Use `next/dynamic` with `ssr: false` since OSMD needs the DOM.
-3. **3D scene isolation** -- render the R3F canvas only on the practice page, lazy-loaded. Run audio analysis in a Web Worker to avoid competing with the Three.js render loop.
-4. **Neon serverless driver** -- use `@neondatabase/serverless` for edge-compatible connections. Works seamlessly with Vercel's edge runtime.
-5. **Biome.js configuration** -- enforce consistent formatting (tabs vs spaces, semicolons, quotes) project-wide. Set up a `biome.json` at root with recommended rules plus any custom preferences.
-6. **Future CMS note** -- for now, pieces are bundled as static MusicXML files and seeded to the DB. A future admin interface could allow uploading MusicXML/PDF/audio, auto-extracting metadata, and managing the piece catalog. The schema already supports this -- just needs a UI and file storage (Vercel Blob or S3).
+1. **Imports** — All shared code lives in `_`-prefixed folders (`_components`, `_lib`, `_types`, `_hooks`, `_stores`, `_data`, `_utils`, `_constants`, `_interfaces`). Use `@_*` path aliases and barrel files (`index.ts`) for clean imports. See README for details.
+2. **Pitch detection is monophonic only for MVP** -- start with single-note melodies. Chord detection is a much harder problem and can be a future enhancement.
+3. **OSMD is a large library (~2MB)** -- dynamically import it only on the practice/piece pages to keep the initial bundle small. Use `next/dynamic` with `ssr: false` since OSMD needs the DOM.
+4. **3D scene isolation** -- render the R3F canvas only on the practice page, lazy-loaded. Run audio analysis in a Web Worker to avoid competing with the Three.js render loop.
+5. **Neon serverless driver** -- use `@neondatabase/serverless` for edge-compatible connections. Works seamlessly with Vercel's edge runtime.
+6. **Biome.js configuration** -- enforce consistent formatting (tabs vs spaces, semicolons, quotes) project-wide. Set up a `biome.json` at root with recommended rules plus any custom preferences.
+7. **Future CMS note** -- for now, pieces are bundled as static MusicXML files and seeded to the DB. A future admin interface could allow uploading MusicXML/PDF/audio, auto-extracting metadata, and managing the piece catalog. The schema already supports this -- just needs a UI and file storage (Vercel Blob or S3).
 
