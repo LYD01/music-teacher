@@ -62,7 +62,7 @@ const colorPalette = [
 	{ name: "Ring", token: "--ring", class: "bg-ring", sample: true },
 ] as const;
 
-export default function SamplePage() {
+export default function SampleContent() {
 	return (
 		<div className="min-h-screen bg-background p-8">
 			<div className="mx-auto max-w-4xl space-y-16">
