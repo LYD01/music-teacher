@@ -10,6 +10,6 @@ export {
 	CardTitle,
 } from "./Card";
 export { Input } from "./Input";
-export { ScrollWindow } from "./ScrollWindow";
 export { Modal } from "./Modal";
+export { ScrollWindow } from "./ScrollWindow";
 export { Separator } from "./Separator";
