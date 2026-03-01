@@ -62,3 +62,24 @@ export async function getActivityPaginated(userId: string, limit = 20, offset = 
 		.limit(limit)
 		.offset(offset);
 }
+
+/**
+ * Paginated activity with piece title for display.
+ */
+export async function getActivityPaginatedWithPieces(userId: string, limit = 20, offset = 0) {
+	return db
+		.select({
+			id: activityLog.id,
+			activityType: activityLog.activityType,
+			pieceId: activityLog.pieceId,
+			metadata: activityLog.metadata,
+			createdAt: activityLog.createdAt,
+			pieceTitle: pieces.title,
+		})
+		.from(activityLog)
+		.leftJoin(pieces, eq(activityLog.pieceId, pieces.id))
+		.where(eq(activityLog.userId, userId))
+		.orderBy(desc(activityLog.createdAt))
+		.limit(limit)
+		.offset(offset);
+}

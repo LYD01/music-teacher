@@ -4,29 +4,7 @@
 import { HistoryFeed } from "@_components";
 import { auth } from "@_lib/auth-server";
 import { getRecentActivityWithPieces } from "@_lib/db/queries/activity";
-
-function formatActivityMessage(
-	activityType: string,
-	pieceTitle: string | null,
-	metadata: Record<string, unknown> | null
-): string {
-	const piece = pieceTitle ?? "a piece";
-	const score = metadata?.score as number | undefined;
-	const scoreStr = score != null ? ` ${Math.round(score)}%` : "";
-
-	switch (activityType) {
-		case "practice_completed":
-			return `Practiced ${piece}${scoreStr ? ` - Score:${scoreStr}` : ""}`;
-		case "new_best_score":
-			return `New personal best on ${piece}!${scoreStr}`;
-		case "piece_started":
-			return `Started learning ${piece}`;
-		case "mastery_reached":
-			return `Mastered ${piece}`;
-		default:
-			return `Activity: ${piece}`;
-	}
-}
+import { formatActivityMessage } from "@_utils/activity";
 
 export default async function HistorySlot() {
 	const { data: session } = await auth.getSession();
