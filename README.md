@@ -1,5 +1,26 @@
 # Music Teacher
 
+## Setup
+
+1. **Node** — Use Node 22.17.0 (via [nvm](https://github.com/nvm-sh/nvm)):
+
+   ```bash
+   nvm install 22.17.0
+   ```
+
+2. **Bun** — Install [Bun](https://bun.sh) and run install:
+
+   ```bash
+   bun install
+   ```
+
+3. **Environment** — Copy `.env.example` to `.env` and fill in your values. To sync env vars from Vercel:
+
+   ```bash
+   bunx vercel link
+   bunx vercel env pull .env --environment=production
+   ```
+
 ## Imports
 
 This project uses path aliases for clean, consistent imports. All shared code lives in `src/` folders prefixed with `_` (e.g. `_components`, `_lib`, `_types`).

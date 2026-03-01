@@ -1,3 +1,6 @@
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 echo ""
 echo "🔍 Running Biome check on staged files..."
 bunx lint-staged
