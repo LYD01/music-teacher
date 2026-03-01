@@ -1,7 +1,8 @@
 "use client";
 
-import type { PerformanceComparison } from "@_lib/music/comparison";
+import type { NoteComparison, PerformanceComparison } from "@_lib/music/comparison";
 import type { AccuracyReport } from "@_types";
+import { useState } from "react";
 
 export interface ProgressInfo {
 	bestScore: number;
@@ -14,9 +15,10 @@ export interface ProgressInfo {
 interface ScoreDisplayProps {
 	report: AccuracyReport;
 	comparison: PerformanceComparison;
-	onPracticeAgain: () => void;
 	isSaving?: boolean;
 	progress?: ProgressInfo | null;
+	/** Compact bar layout for placement above sheet music */
+	compact?: boolean;
 }
 
 function scoreColor(score: number): string {
@@ -58,11 +60,23 @@ const MASTERY_LABELS: Record<string, { label: string; color: string }> = {
 export function ScoreDisplay({
 	report,
 	comparison,
-	onPracticeAgain,
 	isSaving,
 	progress,
+	compact = false,
 }: ScoreDisplayProps) {
 	const { noteComparisons, extraNotes } = comparison;
+
+	if (compact) {
+		return (
+			<CompactScoreBar
+				report={report}
+				comparison={comparison}
+				extraNotesCount={extraNotes.length}
+				isSaving={isSaving}
+				progress={progress}
+			/>
+		);
+	}
 
 	return (
 		<div className="space-y-6">
@@ -106,54 +120,19 @@ export function ScoreDisplay({
 					<h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
 						Note-by-Note
 					</h3>
-					<div className="flex flex-wrap gap-1.5">
-						{noteComparisons.map((c) => {
-							let classes: string;
-							let tooltip: string;
-
-							if (c.status === "missed") {
-								classes = "border-red-500/30 bg-red-500/10 text-red-500";
-								tooltip = `Missed: ${c.expected.noteName}${c.expected.octave}`;
-							} else if (c.pitchCorrect) {
-								const absOffset = Math.abs(c.timingOffsetSec);
-								if (absOffset <= 0.15) {
-									classes = "border-emerald-500/30 bg-emerald-500/10 text-emerald-500";
-									tooltip = `Perfect: ${c.expected.noteName}${c.expected.octave}`;
-								} else {
-									classes = "border-amber-500/30 bg-amber-500/10 text-amber-500";
-									const dir = c.timingOffsetSec > 0 ? "late" : "early";
-									tooltip = `${c.expected.noteName}${c.expected.octave} (${dir} ${absOffset.toFixed(2)}s)`;
-								}
-							} else {
-								classes = "border-red-500/30 bg-red-500/10 text-red-400";
-								const played = c.detected ? `${c.detected.noteName}${c.detected.octave}` : "?";
-								tooltip = `Expected ${c.expected.noteName}${c.expected.octave}, played ${played}`;
-							}
-
-							return (
-								<span
-									key={c.noteIndex}
-									title={tooltip}
-									className={`inline-flex items-baseline gap-0.5 rounded-md border px-2 py-1 text-xs font-medium ${classes}`}
-								>
-									<span>{c.expected.noteName}</span>
-									<span className="text-[10px] opacity-60">{c.expected.octave}</span>
-								</span>
-							);
-						})}
-					</div>
-					<div className="mt-3 flex items-center gap-4 text-[10px] text-muted-foreground">
+					<NoteChipsWithToggle noteComparisons={noteComparisons} compact={false} />
+					<div className="mt-3 flex flex-wrap items-center gap-4 text-[10px] text-muted-foreground">
 						<span className="flex items-center gap-1">
 							<span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
 							Perfect
 						</span>
 						<span className="flex items-center gap-1">
 							<span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
-							Timing off
+							Timing off / Wrong note
 						</span>
 						<span className="flex items-center gap-1">
 							<span className="inline-block h-2 w-2 rounded-full bg-red-500" />
-							Wrong / Missed
+							Missed
 						</span>
 					</div>
 				</div>
@@ -227,16 +206,182 @@ export function ScoreDisplay({
 					)}
 				</div>
 			)}
-
-			{/* Practice again */}
-			<button
-				type="button"
-				onClick={onPracticeAgain}
-				className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-			>
-				Practice Again
-			</button>
 		</div>
+	);
+}
+
+/** Minimal compact score bar for placement above sheet music */
+function CompactScoreBar({
+	report,
+	comparison,
+	extraNotesCount,
+	isSaving,
+	progress,
+}: {
+	report: AccuracyReport;
+	comparison: PerformanceComparison;
+	extraNotesCount: number;
+	isSaving?: boolean;
+	progress?: ProgressInfo | null;
+}) {
+	const { noteComparisons } = comparison;
+
+	return (
+		<div className="flex flex-wrap items-center gap-y-2 py-2">
+			{/* Overall score */}
+			<div className="flex items-baseline gap-1 pr-4 border-r border-border/50">
+				<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+					Score
+				</span>
+				<span className={`text-xl font-bold tabular-nums ${scoreColor(report.overallScore)}`}>
+					{report.overallScore}%
+				</span>
+			</div>
+
+			{/* Mini accuracy bars */}
+			<div className="flex items-center gap-4 pl-4 pr-4 border-r border-border/50">
+				<MiniBar label="Pitch" value={report.pitchAccuracy} />
+				<MiniBar label="Rhythm" value={report.rhythmAccuracy} />
+			</div>
+
+			{/* Stats */}
+			<div className="flex items-center gap-3 pl-4 pr-4 text-xs border-r border-border/50">
+				<span className="tabular-nums text-emerald-500">
+					{report.notesHit}/{report.totalNotes} hit
+				</span>
+				<span className="tabular-nums text-red-500">
+					{report.notesMissed}/{report.totalNotes} missed
+				</span>
+				<span className="tabular-nums text-amber-500">{extraNotesCount} extra</span>
+			</div>
+
+			{/* Note-by-note chips */}
+			{noteComparisons.length > 0 && (
+				<div className="pl-4 pr-4 border-r border-border/50">
+					<NoteChipsWithToggle noteComparisons={noteComparisons} compact />
+				</div>
+			)}
+
+			{/* Progress */}
+			{progress && !isSaving && (
+				<div className="flex items-center gap-3 pl-4 text-[11px] text-muted-foreground">
+					{progress.isNewBest && progress.totalSessions > 1 && (
+						<span className="font-medium text-emerald-500">New best!</span>
+					)}
+					<span className="tabular-nums">Best {progress.bestScore}%</span>
+					<span className="tabular-nums">Avg {progress.avgScore}%</span>
+					<span className="tabular-nums">{progress.totalSessions} sessions</span>
+					{progress.masteryLevel && (
+						<span
+							className={`font-medium ${MASTERY_LABELS[progress.masteryLevel]?.color ?? "text-foreground"}`}
+						>
+							{MASTERY_LABELS[progress.masteryLevel]?.label ?? progress.masteryLevel}
+						</span>
+					)}
+				</div>
+			)}
+		</div>
+	);
+}
+
+function MiniBar({ label, value }: { label: string; value: number }) {
+	return (
+		<div className="flex w-16 flex-col gap-0.5">
+			<div className="flex justify-between text-[10px]">
+				<span className="text-muted-foreground">{label}</span>
+				<span className={`font-medium tabular-nums ${scoreColor(value)}`}>{value}%</span>
+			</div>
+			<div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+				<div
+					className={`h-full rounded-full ${barColor(value)}`}
+					style={{ width: `${Math.min(value, 100)}%` }}
+				/>
+			</div>
+		</div>
+	);
+}
+
+function NoteChipsWithToggle({
+	noteComparisons,
+	compact,
+}: {
+	noteComparisons: NoteComparison[];
+	compact?: boolean;
+}) {
+	const [showMissed, setShowMissed] = useState(false);
+	const hits = noteComparisons.filter((c) => c.status === "hit");
+	const missed = noteComparisons.filter((c) => c.status === "missed");
+	const visible = showMissed ? noteComparisons : hits;
+
+	return (
+		<div className={`flex flex-wrap items-center ${compact ? "gap-1" : "gap-1.5"}`}>
+			{visible.map((c) => (
+				<NoteChip key={c.noteIndex} comparison={c} compact={compact} />
+			))}
+			{missed.length > 0 && (
+				<button
+					type="button"
+					onClick={() => setShowMissed(!showMissed)}
+					className={`rounded border border-dashed border-muted-foreground/40 font-medium text-muted-foreground transition-colors hover:border-muted-foreground/60 hover:text-foreground ${
+						compact ? "px-1.5 py-0.5 text-[9px]" : "px-2 py-1 text-[10px]"
+					}`}
+				>
+					{showMissed ? "Hide missed" : `See missed (${missed.length})`}
+				</button>
+			)}
+		</div>
+	);
+}
+
+function NoteChip({ comparison, compact }: { comparison: NoteComparison; compact?: boolean }) {
+	const c = comparison;
+	let classes: string;
+	let tooltip: string;
+
+	if (c.status === "missed") {
+		classes = compact
+			? "bg-red-500/20 text-red-500"
+			: "border-red-500/30 bg-red-500/10 text-red-500";
+		tooltip = `Missed: ${c.expected.noteName}${c.expected.octave}`;
+	} else if (c.pitchCorrect) {
+		const absOffset = Math.abs(c.timingOffsetSec);
+		if (absOffset <= 0.15) {
+			classes = compact
+				? "bg-emerald-500/20 text-emerald-500"
+				: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500";
+			tooltip = `Perfect: ${c.expected.noteName}${c.expected.octave}`;
+		} else {
+			classes = compact
+				? "bg-amber-500/20 text-amber-500"
+				: "border-amber-500/30 bg-amber-500/10 text-amber-500";
+			const dir = c.timingOffsetSec > 0 ? "late" : "early";
+			tooltip = `${c.expected.noteName}${c.expected.octave} (${dir} ${absOffset.toFixed(2)}s)`;
+		}
+	} else {
+		classes = compact
+			? "bg-amber-500/20 text-amber-500"
+			: "border-amber-500/30 bg-amber-500/10 text-amber-500";
+		const played = c.detected ? `${c.detected.noteName}${c.detected.octave}` : "?";
+		tooltip = `Expected ${c.expected.noteName}${c.expected.octave}, played ${played}`;
+	}
+
+	return (
+		<span
+			title={tooltip}
+			className={`group relative inline-flex cursor-help items-baseline gap-0.5 rounded font-medium ${classes} ${
+				compact ? "border-0 px-1.5 py-0.5 text-[10px]" : "rounded-md border px-2 py-1 text-xs"
+			}`}
+		>
+			<span>{c.expected.noteName}</span>
+			<span className={compact ? "opacity-70" : "text-[10px] opacity-60"}>{c.expected.octave}</span>
+			{/* Custom tooltip (shows ~150ms after hover, faster than native title) */}
+			<span
+				role="tooltip"
+				className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 whitespace-nowrap rounded border border-border bg-card px-2 py-1 text-[10px] text-card-foreground shadow-md opacity-0 transition-opacity duration-150 delay-150 group-hover:opacity-100"
+			>
+				{tooltip}
+			</span>
+		</span>
 	);
 }
 

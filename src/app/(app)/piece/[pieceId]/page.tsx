@@ -80,7 +80,7 @@ export default async function PiecePage({ params }: PiecePageProps) {
 
 			<div className="mt-6">
 				<h2 className="mb-3 text-lg font-semibold text-foreground">Sheet Music</h2>
-				<SheetMusicViewer musicxmlUrl={piece.musicxmlPath} />
+				<SheetMusicViewer musicxmlUrl={piece.musicxmlPath} scrollHeight="60vh" />
 			</div>
 
 			<div className="mt-6 flex gap-3">

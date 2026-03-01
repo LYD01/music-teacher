@@ -1,12 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+
+type OsmdInstance = InstanceType<typeof import("opensheetmusicdisplay").OpenSheetMusicDisplay>;
+
+export interface SheetMusicViewerHandle {
+	getOsmd: () => OsmdInstance | null;
+	getContainer: () => HTMLDivElement | null;
+}
 
 interface SheetMusicViewerProps {
 	musicxmlUrl: string;
 	highlightMeasure?: number;
 	className?: string;
 	compact?: boolean;
+	/** Wraps the score in a scrollable viewport with this max height. */
+	scrollHeight?: string;
+	/** Enable OSMD's followCursor so the viewport auto-scrolls with the cursor. */
+	enableFollowCursor?: boolean;
+	/** Imperative handle ref for parent components that need direct OSMD access. */
+	handleRef?: React.RefObject<SheetMusicViewerHandle | null>;
 }
 
 export function SheetMusicViewer({
@@ -14,19 +27,29 @@ export function SheetMusicViewer({
 	highlightMeasure,
 	className = "",
 	compact = false,
+	scrollHeight,
+	enableFollowCursor = false,
+	handleRef,
 }: SheetMusicViewerProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
-	const osmdRef = useRef<InstanceType<
-		typeof import("opensheetmusicdisplay").OpenSheetMusicDisplay
-	> | null>(null);
+	const scrollRef = useRef<HTMLDivElement>(null);
+	const osmdRef = useRef<OsmdInstance | null>(null);
 	const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 	const [errorMsg, setErrorMsg] = useState("");
+
+	useImperativeHandle(
+		handleRef,
+		() => ({
+			getOsmd: () => osmdRef.current,
+			getContainer: () => containerRef.current,
+		}),
+		[]
+	);
 
 	const initOSMD = useCallback(async () => {
 		const container = containerRef.current;
 		if (!container) return;
 
-		// OSMD requires container to have non-zero width; wait for layout
 		if (container.offsetWidth <= 0) return;
 
 		try {
@@ -42,6 +65,7 @@ export function SheetMusicViewer({
 				drawPartAbbreviations: false,
 				drawMeasureNumbers: true,
 				drawMetronomeMarks: !compact,
+				followCursor: enableFollowCursor,
 			});
 
 			osmdRef.current = osmd;
@@ -51,13 +75,14 @@ export function SheetMusicViewer({
 			const xml = await res.text();
 
 			await osmd.load(xml);
+			osmd.Zoom = 1.5;
 			osmd.render();
 			setStatus("ready");
 		} catch (err) {
 			setErrorMsg(err instanceof Error ? err.message : "Failed to render sheet music");
 			setStatus("error");
 		}
-	}, [musicxmlUrl, compact]);
+	}, [musicxmlUrl, compact, enableFollowCursor]);
 
 	useEffect(() => {
 		const container = containerRef.current;
@@ -90,8 +115,6 @@ export function SheetMusicViewer({
 		const osmd = osmdRef.current;
 		if (!osmd || status !== "ready" || highlightMeasure == null) return;
 
-		// Measure highlighting via OSMD cursor will be wired up in Phase 3
-		// when the practice session page drives real-time playback position
 		try {
 			osmd.cursor.show();
 		} catch {
@@ -99,16 +122,31 @@ export function SheetMusicViewer({
 		}
 	}, [highlightMeasure, status]);
 
+	const scoreContent = (
+		<div
+			ref={containerRef}
+			className={`osmd-container min-h-[400px] w-full ${compact ? "p-2" : "p-4"}`}
+		/>
+	);
+
 	return (
-		<div className={`relative rounded-lg border border-border bg-white ${className}`}>
-			{/* Container must stay visible with dimensions so OSMD can render */}
-			<div
-				ref={containerRef}
-				className={`osmd-container min-h-[400px] w-full ${compact ? "p-2" : "p-4"}`}
-			/>
+		<div
+			className={`sheet-music-viewer relative rounded-lg border border-border bg-card ${className}`}
+		>
+			{scrollHeight ? (
+				<div
+					ref={scrollRef}
+					className="scroll-window overflow-auto"
+					style={{ maxHeight: scrollHeight }}
+				>
+					{scoreContent}
+				</div>
+			) : (
+				scoreContent
+			)}
 
 			{status === "loading" && (
-				<div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/90 dark:bg-card/90">
+				<div className="absolute inset-0 flex items-center justify-center rounded-lg bg-card/90 backdrop-blur-sm">
 					<div className="flex flex-col items-center gap-3">
 						<div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
 						<p className="text-sm text-muted-foreground">Loading sheet music...</p>
@@ -117,7 +155,7 @@ export function SheetMusicViewer({
 			)}
 
 			{status === "error" && (
-				<div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/90 dark:bg-card/90">
+				<div className="absolute inset-0 flex items-center justify-center rounded-lg bg-card/90 backdrop-blur-sm">
 					<div className="flex flex-col items-center gap-2 text-center">
 						<svg
 							className="h-8 w-8 text-destructive"
