@@ -1,3 +1,5 @@
+export type { UseAvatarReturn } from "./use-avatar";
+export { useAvatar } from "./use-avatar";
 export type { UseComparisonReturn } from "./use-comparison";
 export { useComparison } from "./use-comparison";
 export { useMediaQuery } from "./use-media-query";

@@ -6,8 +6,10 @@ export type {
 } from "./audio";
 export type {
 	AccuracyReport,
+	AvatarConfig,
 	AvatarMood,
 	FeedbackResponse,
+	ReactionEvent,
 } from "./feedback";
 export type {
 	Difficulty,

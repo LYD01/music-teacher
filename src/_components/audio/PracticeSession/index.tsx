@@ -3,7 +3,9 @@
 import { AudioControls } from "@_components/audio/AudioControls";
 import { AudioVisualizer } from "@_components/audio/AudioVisualizer";
 import { PitchDisplay } from "@_components/audio/PitchDisplay";
+import { AvatarController } from "@_components/avatar/AvatarController";
 import { Badge } from "@_components/common/Badge";
+import { FeedbackPanel } from "@_components/feedback/FeedbackPanel";
 import { NoteOverlay } from "@_components/sheet-music/NoteOverlay";
 import { PracticeSheetMusicViewer } from "@_components/sheet-music/PracticeSheetMusicViewer";
 import type { SheetMusicViewerHandle } from "@_components/sheet-music/SheetMusicViewer";
@@ -11,7 +13,7 @@ import { useComparison } from "@_hooks/use-comparison";
 import { useMicrophone } from "@_hooks/use-microphone";
 import { useNoteDetection } from "@_hooks/use-note-detection";
 import { usePitchDetection } from "@_hooks/use-pitch-detection";
-import type { AccuracyReport, DetectedNote, Piece } from "@_types";
+import type { AccuracyReport, DetectedNote, FeedbackResponse, Piece } from "@_types";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type ProgressInfo, ScoreDisplay } from "./ScoreDisplay";
@@ -24,6 +26,23 @@ const difficultyVariant = {
 
 interface PracticeSessionProps {
 	piece: Piece;
+}
+
+async function fetchFeedback(
+	pieceTitle: string,
+	report: AccuracyReport
+): Promise<FeedbackResponse | null> {
+	try {
+		const res = await fetch("/api/feedback", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ pieceTitle, report }),
+		});
+		if (!res.ok) return null;
+		return res.json();
+	} catch {
+		return null;
+	}
 }
 
 async function saveSessionToDb(
@@ -69,6 +88,8 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 	const [showResults, setShowResults] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [progress, setProgress] = useState<ProgressInfo | null>(null);
+	const [feedback, setFeedback] = useState<FeedbackResponse | null>(null);
+	const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
 	const notesRef = useRef<DetectedNote[]>([]);
 	notesRef.current = notes;
 	const sessionStartRef = useRef<Date | null>(null);
@@ -78,6 +99,7 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 		setShowResults(false);
 		resetComparison();
 		setProgress(null);
+		setFeedback(null);
 		sessionStartRef.current = new Date();
 		setIsStarting(true);
 		await mic.start();
@@ -101,6 +123,17 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 			setIsSaving(false);
 		});
 	}, [showResults, report, piece.id]);
+
+	useEffect(() => {
+		if (!showResults || !report) return;
+
+		setIsFeedbackLoading(true);
+		fetchFeedback(piece.title, report)
+			.then((fb) => {
+				if (fb) setFeedback(fb);
+			})
+			.finally(() => setIsFeedbackLoading(false));
+	}, [showResults, report, piece.title]);
 
 	const sessionStartTime = sessionStartRef.current ? sessionStartRef.current.getTime() : null;
 
@@ -195,7 +228,7 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 
 					{/* Right sidebar */}
 					<div className="space-y-4">
-						{/* Live pitch display & note log when practicing (score moved to top bar) */}
+						{/* Live pitch display & note log when practicing */}
 						{!showResults && (
 							<>
 								<PitchDisplay pitch={pitch} isListening={mic.isCapturing} />
@@ -203,47 +236,17 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 							</>
 						)}
 
-						{/* Avatar placeholder */}
-						<div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/50 p-10 text-center">
-							<svg
-								className="mb-2 h-10 w-10 text-muted-foreground/40"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								strokeWidth={1.5}
-								aria-hidden="true"
-							>
-								<title>Avatar</title>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0zM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-								/>
-							</svg>
-							<p className="text-sm font-medium text-muted-foreground">3D Avatar</p>
-							<p className="mt-1 text-xs text-muted-foreground/60">Coming in Phase 4</p>
-						</div>
+						{/* 3D Avatar teacher */}
+						<AvatarController
+							isRecording={mic.isCapturing}
+							notes={notes}
+							expectedNotes={expectedNotes}
+							report={report}
+							showResults={showResults}
+						/>
 
-						{/* Feedback placeholder */}
-						<div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/50 p-10 text-center">
-							<svg
-								className="mb-2 h-10 w-10 text-muted-foreground/40"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								strokeWidth={1.5}
-								aria-hidden="true"
-							>
-								<title>Feedback</title>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"
-								/>
-							</svg>
-							<p className="text-sm font-medium text-muted-foreground">AI Feedback</p>
-							<p className="mt-1 text-xs text-muted-foreground/60">Coming in Phase 4</p>
-						</div>
+						{/* AI Feedback */}
+						{showResults && <FeedbackPanel feedback={feedback} isLoading={isFeedbackLoading} />}
 					</div>
 				</div>
 			</div>

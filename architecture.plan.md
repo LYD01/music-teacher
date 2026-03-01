@@ -10,10 +10,10 @@ todos:
     status: completed
   - id: phase3-audio-practice
     content: "Phase 3: Mic capture (Web Audio API), WASM pitch detection (Rust/wasm-pack, YIN algorithm), note detector, comparison engine, practice page, save sessions + progress to DB"
-    status: pending
+    status: completed
   - id: phase4-avatar-feedback
-    content: "Phase 4: React Three Fiber scene, Mixamo character + animations, animation state machine, Ollama AI feedback, feedback panel"
-    status: pending
+    content: "Phase 4: React Three Fiber scene, universal 3D model upload (any GLB), transform-based reaction system, live note feedback via avatar, Ollama AI feedback, feedback panel"
+    status: completed
   - id: phase5-dashboard-history
     content: "Phase 5: Dashboard parallel routes (@history, @progress), history feed, progress cards, full history page with pagination"
     status: pending
@@ -440,15 +440,20 @@ Each activity row stores a `metadata` JSONB field for flexible data (scores, dur
 - ~~Save practice sessions to DB~~ ✅
 - ~~Update `user_piece_progress` after each session~~ ✅
 
-### Phase 4: 3D Avatar + Feedback
+### Phase 4: 3D Avatar + Feedback (COMPLETED)
 
-- Set up React Three Fiber scene
-- Source rigged character (Ready Player Me / Mixamo)
-- Download and integrate 4-6 Mixamo animations
-- Build animation state machine mapping scores to gestures
-- Integrate Ollama for AI text feedback
-- Build `FeedbackPanel` and `ScoreBreakdown` components
-- Graceful fallback when Ollama is not running
+- ~~Set up React Three Fiber scene (Canvas, lighting, environment, OrbitControls)~~ ✅
+- ~~Universal 3D model support — users upload any `.glb` model (shark, Roblox character, etc.) as their avatar teacher~~ ✅
+- ~~Default procedural avatar (capsule body + eyes) for users without a custom model~~ ✅
+- ~~Transform-based reaction system (bounce, wobble, glow, scale pulse, spin) — works with ANY model, no skeleton required~~ ✅
+- ~~Live note-by-note avatar reactions: good_note (green glow + bounce), bad_note (red flash + wobble), great_streak (gold glow + spin), celebrating (big bounce + particles)~~ ✅
+- ~~Reaction particle effects (instanced mesh sparkles for good/great/celebrating moods)~~ ✅
+- ~~Model upload via `.glb` file input, persisted to IndexedDB + localStorage~~ ✅
+- ~~AvatarController bridges live note detection → mood → avatar transforms~~ ✅
+- ~~Integrate Ollama for AI text feedback with graceful fallback when Ollama is not running~~ ✅
+- ~~Build enhanced `FeedbackPanel` with suggestions, encouragement, and focus areas~~ ✅
+- ~~`/api/feedback` route proxies to Ollama, returns structured JSON feedback~~ ✅
+- ~~Score-based fallback feedback when Ollama is unavailable~~ ✅
 
 ### Phase 5: Dashboard + History
 

@@ -131,7 +131,7 @@ export function SheetMusicViewer({
 
 	return (
 		<div
-			className={`sheet-music-viewer relative rounded-lg border border-border bg-card ${className}`}
+			className={`sheet-music-viewer relative rounded-lg border border-border bg-white ${className}`}
 		>
 			{scrollHeight ? (
 				<div

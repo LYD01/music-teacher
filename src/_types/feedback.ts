@@ -14,4 +14,23 @@ export interface FeedbackResponse {
 	focusAreas: string[];
 }
 
-export type AvatarMood = "idle" | "listening" | "encouraging" | "celebrating" | "thinking";
+export type AvatarMood =
+	| "idle"
+	| "listening"
+	| "good_note"
+	| "bad_note"
+	| "great_streak"
+	| "encouraging"
+	| "celebrating"
+	| "thinking";
+
+export interface ReactionEvent {
+	mood: AvatarMood;
+	intensity: number;
+	timestamp: number;
+}
+
+export interface AvatarConfig {
+	modelUrl: string | null;
+	modelName: string;
+}
