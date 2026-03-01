@@ -1,0 +1,20 @@
+# Skip validation for merge commits
+if [ -f .git/MERGE_HEAD ]; then
+  exit 0
+fi
+
+if ! bunx commitlint --edit "$1" > /dev/null 2>&1; then
+  echo ""
+  echo "❌ Commit message does not follow Conventional Commits format."
+  echo ""
+  echo "  Use one of these prefixes:"
+  echo "    feat, fix, docs, style, refactor,"
+  echo "    perf, test, build, ci, chore, revert"
+  echo ""
+  echo "  Format:   type(scope?): description"
+  echo ""
+  echo "  Examples: feat: add login page"
+  echo "            fix(auth): resolve token expiry bug"
+  echo ""
+  exit 1
+fi

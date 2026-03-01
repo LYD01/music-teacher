@@ -17,6 +17,12 @@ export interface PitchDetectionConfig {
 	maxFrequency: number;
 }
 
+export interface AudioPipelineConfig {
+	sampleRate: number;
+	fftSize: number;
+	smoothingTimeConstant: number;
+}
+
 export interface AudioCaptureState {
 	isCapturing: boolean;
 	stream: MediaStream | null;

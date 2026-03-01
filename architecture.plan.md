@@ -1,15 +1,15 @@
 ---
 name: AI Music Teacher v2
-overview: "Revised architecture for the AI Music Teacher web app: Next.js 15 with optimized App Router (parallel, intercepting, dynamic routes), Tailwind CSS with hand-built components, Biome.js for linting/formatting, Neon Postgres via Drizzle ORM for user progress/history/piece tracking, Auth.js v5 for simple login, Ollama for AI feedback, and a 3D avatar. Sheet music rendered via OSMD from bundled MusicXML files."
+overview: "Revised architecture for the AI Music Teacher web app: Next.js 16 with optimized App Router (parallel, intercepting, dynamic routes), Tailwind CSS v4 with hand-built components, Biome.js for linting/formatting, Neon Postgres via Drizzle ORM (@vercel/postgres driver) for user progress/history/piece tracking, Neon Auth for authentication, Ollama for AI feedback, and a 3D avatar. Sheet music rendered via OSMD from bundled MusicXML files."
 todos:
   - id: phase1-foundation
-    content: "Phase 1: Next.js scaffold, Tailwind/Biome setup, App Router structure, Neon/Drizzle schema, Auth.js, core layout + common components, DB seed"
-    status: pending
+    content: "Phase 1: Next.js scaffold, Tailwind/Biome setup, App Router structure, Neon/Drizzle schema, Neon Auth, core layout + common components, DB seed"
+    status: completed
   - id: phase2-sheet-library
     content: "Phase 2: OSMD integration, MusicXML parser, piece library with genre filter, piece detail page, intercepting route modal, DB wiring"
-    status: pending
+    status: completed
   - id: phase3-audio-practice
-    content: "Phase 3: Mic capture, Pitchy pitch detection, note detector, comparison engine, practice page, save sessions + progress to DB"
+    content: "Phase 3: Mic capture (Web Audio API), WASM pitch detection (Rust/wasm-pack, YIN algorithm), note detector, comparison engine, practice page, save sessions + progress to DB"
     status: pending
   - id: phase4-avatar-feedback
     content: "Phase 4: React Three Fiber scene, Mixamo character + animations, animation state machine, Ollama AI feedback, feedback panel"
@@ -27,14 +27,14 @@ isProject: false
 
 ## Tech Stack (Revised)
 
-- **Framework**: Next.js 15, App Router, TypeScript
-- **Styling**: Tailwind CSS (hand-built components, no UI library)
-- **Linter/Formatter**: Biome.js
-- **ORM**: Drizzle ORM + `@neondatabase/serverless` driver
+- **Framework**: Next.js 16, App Router, TypeScript, React 19
+- **Styling**: Tailwind CSS v4 (hand-built components, no UI library)
+- **Linter/Formatter**: Biome.js 2
+- **ORM**: Drizzle ORM + `@vercel/postgres` driver
 - **Database**: Neon Postgres (hosted on Vercel)
-- **Auth**: Auth.js v5 (NextAuth) with GitHub OAuth (portfolio-friendly, one-click)
+- **Auth**: Neon Auth (Vercel integration, cookie-based sessions)
 - **Sheet Music**: OpenSheetMusicDisplay (OSMD) rendering MusicXML
-- **Audio**: Web Audio API + Pitchy (pitch detection)
+- **Audio**: Web Audio API + WASM (Rust/wasm-pack, YIN algorithm) for low-latency pitch detection
 - **3D Avatar**: React Three Fiber + Drei + Mixamo animations
 - **AI Feedback**: Ollama (local) via API route
 - **State**: Zustand (client-side session state only; persistent data goes to DB)
@@ -52,9 +52,13 @@ src/app/
 ├── (auth)/                                 # Route group: auth pages (minimal layout)
 │   ├── layout.tsx                          # Centered card layout, no sidebar
 │   ├── login/
-│   │   └── page.tsx                        # Login page (GitHub OAuth button)
-│   └── signup/
-│       └── page.tsx                        # Optional signup flow
+│   │   └── page.tsx                        # Redirects to /auth/sign-in
+│   ├── signup/
+│   │   └── page.tsx                        # Redirects to /auth/sign-up
+│   ├── auth/[pathname]/
+│   │   └── page.tsx                        # Neon Auth UI wrapper
+│   └── account/[pathname]/
+│       └── page.tsx                        # Account management
 │
 ├── (app)/                                  # Route group: authenticated app
 │   ├── layout.tsx                          # App shell (sidebar nav, header, auth guard)
@@ -83,13 +87,24 @@ src/app/
 │   │       └── practice/
 │   │           └── page.tsx                # Practice session (sheet music + audio + avatar)
 │   │
-│   └── history/
-│       ├── page.tsx                        # Full history log (paginated)
-│       └── loading.tsx
+│   ├── history/
+│   │   ├── page.tsx                        # Full history log (paginated)
+│   │   └── loading.tsx
+│   │
+│   ├── settings/
+│   │   └── page.tsx                        # User settings (theme, instrument prefs)
+│   │
+│   └── manage/
+│       └── page.tsx                        # Admin piece management
+│
+├── (cms)/                                  # Route group: public CMS pages
+│   ├── layout.tsx                          # Public nav wrapper
+│   └── [...slug]/
+│       └── page.tsx                        # Dynamic CMS pages
 │
 └── api/
-    ├── auth/[...nextauth]/
-    │   └── route.ts                        # Auth.js catch-all
+    ├── auth/[...path]/
+    │   └── route.ts                        # Neon Auth catch-all (GET/POST/PUT/DELETE/PATCH)
     ├── feedback/
     │   └── route.ts                        # POST: Ollama feedback proxy
     └── progress/
@@ -208,18 +223,20 @@ erDiagram
 **MVP approach: Bundled MusicXML files rendered by OSMD**
 
 1. Source 5-8 beginner classical guitar pieces from public domain (IMSLP) or create them in [MuseScore](https://musescore.org) (free, exports MusicXML)
-2. Store `.musicxml` files in `src/_data/pieces/` and seed piece metadata to Neon DB
+2. Store `.musicxml` files in `public/pieces/` (served as static files) and seed piece metadata to Neon DB
 3. OSMD renders them in the browser with full notation, key signatures, time signatures
 4. During practice: OSMD API highlights the current measure
 5. After analysis: overlay correct (green) / incorrect (red) notes on the score
 
 **Starter pieces (single-note melodies for reliable pitch detection):**
 
-- Ode to Joy (Beethoven) -- very beginner
-- Romanza (Anonymous) -- beginner
-- Greensleeves -- beginner/intermediate
-- Lagrima (Tarrega) -- intermediate
-- Estudio in A minor (Tarrega) -- intermediate
+- Ode to Joy (Beethoven) -- beginner, classical
+- Romanza / Spanish Romance (Anonymous) -- beginner, classical
+- Greensleeves (Traditional English) -- beginner, folk
+- Malagueña (Traditional Spanish) -- beginner, latin
+- Lágrima (Tárrega) -- intermediate, classical
+- Estudio in A minor (Tárrega) -- intermediate, classical
+- Adelita (Tárrega) -- intermediate, classical
 
 **Future CMS feature (noted, not built in MVP):**
 A content management interface where you can upload MusicXML, PDF, or audio files, tag them with metadata (difficulty, genre, instrument), and have them appear in the library. Could also support community uploads. This would replace the bundled file approach.
@@ -248,10 +265,13 @@ music-teacher/
 │   ├── app/                                # (see App Router section above)
 │   │
 │   ├── _components/                        # All hand-built, no UI library
-│   │   ├── common/                         # Button, Input, Card, Modal, etc.
+│   │   ├── common/                         # Button, Input, Card, Modal, Badge, etc.
 │   │   │   ├── Button.tsx
 │   │   │   ├── Modal.tsx
 │   │   │   └── ...
+│   │   ├── library/
+│   │   │   ├── PieceCard.tsx
+│   │   │   └── GenreFilter.tsx
 │   │   ├── sheet-music/
 │   │   │   ├── SheetMusicViewer.tsx
 │   │   │   └── NoteOverlay.tsx
@@ -276,7 +296,7 @@ music-teacher/
 │   ├── _lib/
 │   │   ├── audio/
 │   │   │   ├── capture.ts                  # Mic → MediaStream → AudioWorklet
-│   │   │   ├── pitch-detector.ts           # Pitchy wrapper
+│   │   │   ├── pitch-detector.ts           # WASM pitch detector wrapper (YIN algorithm)
 │   │   │   ├── note-detector.ts            # Onset/offset detection
 │   │   │   └── analyzer.ts                 # Score computation
 │   │   ├── music/
@@ -320,15 +340,22 @@ music-teacher/
 │   │
 │   ├── _hooks/                             # React hooks
 │   │   ├── use-sidebar.tsx
-│   │   └── use-media-query.ts
+│   │   ├── use-media-query.ts
+│   │   └── use-microphone.ts               # Mic capture lifecycle (start/stop/state)
 │   │
 │   └── _data/
-│       ├── instruments/                    # Instrument configs
-│       │   └── acoustic-guitar.ts          # Guitar config
-│       └── pieces/                         # Bundled MusicXML files
-│           ├── ode-to-joy.musicxml
-│           ├── romanza.musicxml
-│           └── greensleeves.musicxml
+│       └── instruments/                    # Instrument configs
+│           └── acoustic-guitar.ts          # Guitar config
+│
+├── public/
+│   └── pieces/                             # Static MusicXML files (served at /pieces/*)
+│       ├── ode-to-joy.musicxml
+│       ├── romanza.musicxml
+│       ├── greensleeves.musicxml
+│       ├── lagrima.musicxml
+│       ├── estudio-am.musicxml
+│       ├── malaguena.musicxml
+│       └── adelita.musicxml
 │
 └── README.md
 ```
@@ -341,21 +368,21 @@ music-teacher/
 sequenceDiagram
     participant User
     participant App as Next.js App
-    participant AuthJS as Auth.js
+    participant NeonAuth as Neon Auth
     participant Neon as Neon Postgres
 
-    User->>App: Click "Sign in with GitHub"
-    App->>AuthJS: Redirect to GitHub OAuth
-    AuthJS->>User: GitHub consent screen
-    User->>AuthJS: Authorize
-    AuthJS->>Neon: Upsert user (UUID auto-generated)
-    AuthJS->>App: Set session cookie
+    User->>App: Click "Sign in"
+    App->>NeonAuth: Redirect to Neon Auth UI
+    NeonAuth->>User: Sign-in/sign-up form
+    User->>NeonAuth: Submit credentials
+    NeonAuth->>Neon: Upsert user
+    NeonAuth->>App: Set session cookie
     App->>User: Redirect to /dashboard
 ```
 
 
 
-Auth.js v5 with the **Drizzle adapter** handles user table management automatically. GitHub OAuth is one-click for developers viewing your portfolio. The adapter auto-generates UUIDs and manages the `users`, `accounts`, and `sessions` tables.
+Neon Auth (via Vercel integration) handles user authentication with cookie-based sessions. The `@neondatabase/neon-js` client provides server-side session access via `auth.getSession()`. Routes under `(app)/` are protected by the layout-level auth guard.
 
 ---
 
@@ -379,36 +406,39 @@ Each activity row stores a `metadata` JSONB field for flexible data (scores, dur
 
 ## Build Phases (Revised)
 
-### Phase 1: Foundation
+### Phase 1: Foundation (COMPLETED)
 
-- Initialize Next.js 15 with TypeScript, Tailwind CSS, Biome.js
+- Initialize Next.js 16 with TypeScript, Tailwind CSS v4, Biome.js 2
 - Set up the full App Router structure (route groups, parallel routes, layouts)
-- Configure Neon + Drizzle ORM, define schema, run initial migration
-- Set up Auth.js v5 with GitHub OAuth + Drizzle adapter
-- Build core layout components: `AppShell`, `Sidebar`, `Header` (Tailwind)
-- Build common components: `Button`, `Card`, `Input`, `Modal`
-- Implement login flow and protected route middleware
-- Seed DB with initial piece metadata
+- Configure Neon + Drizzle ORM (`@vercel/postgres` driver), define schema
+- Set up Neon Auth with cookie-based sessions
+- Build core layout components: `AppShell`, `Sidebar`, `Header`, `MobileBottomNav`, `Footer` (Tailwind)
+- Build common components: `Button`, `Card`, `Input`, `Modal`, `Badge`, `Accordion`, `Separator`, `ScrollWindow`
+- Implement login flow and layout-level auth guard
+- Landing page with hero section and feature highlights
+- Dark/light theme system with cookie persistence
 
-### Phase 2: Sheet Music + Library
+### Phase 2: Sheet Music + Library (COMPLETED)
 
-- Integrate OSMD, build `SheetMusicViewer` component
-- Build MusicXML parser to extract expected note sequences
-- Source/create 5+ beginner classical guitar MusicXML files
-- Build library page with genre filtering (`[genre]` dynamic route)
-- Build piece detail page (`[pieceId]`)
-- Implement intercepting route for piece preview modal in library
-- Wire up piece data from Neon DB
+- Integrated OSMD (`opensheetmusicdisplay@1.9.7`), built `SheetMusicViewer` component with dynamic import, loading/error states, and retry
+- Built MusicXML parser to extract expected note sequences (pitch, octave, beat position, duration)
+- Created 7 beginner/intermediate classical guitar MusicXML files in `public/pieces/`
+- Built library page with `GenreFilter` (pill tabs) and `PieceCard` grid
+- Built `[genre]` dynamic route page with filtered pieces from DB
+- Built piece detail page with OSMD sheet music preview, metadata cards, and practice link
+- Implemented intercepting route modal (`@modal/(..)piece/[pieceId]`) with `ModalOverlay` (backdrop dismiss, ESC key, close button)
+- Wired up piece queries (`getAllPieces`, `getPieceById`, `getPiecesByGenre`, `getAvailableGenres`)
+- Built seed script (`bun run seed`) to populate pieces and collections
 
 ### Phase 3: Audio Pipeline + Practice
 
-- Implement mic capture with Web Audio API
-- Integrate Pitchy for pitch detection
-- Build note onset/offset detector
-- Build performance comparison engine (detected vs expected)
-- Create the practice session page with `AudioControls` and live visualizer
-- Save practice sessions to DB
-- Update `user_piece_progress` after each session
+- ~~Implement mic capture with Web Audio API (AudioContext → AnalyserNode pipeline, `useMicrophone` hook)~~ ✅
+- ~~Build WASM pitch detector (Rust/wasm-pack YIN algorithm, JS fallback, `PitchDetector` class, `usePitchDetection` hook, live `PitchDisplay` tuning meter)~~ ✅
+- ~~Build note onset/offset detector (`NoteDetector` state machine, `useNoteDetection` hook, note log UI)~~ ✅
+- ~~Build performance comparison engine (detected vs expected)~~ ✅
+- ~~Create the practice session page with `AudioControls` and live visualizer~~ ✅
+- ~~Save practice sessions to DB~~ ✅
+- ~~Update `user_piece_progress` after each session~~ ✅
 
 ### Phase 4: 3D Avatar + Feedback
 
@@ -439,13 +469,67 @@ Each activity row stores a `metadata` JSONB field for flexible data (scores, dur
 
 ---
 
+## WASM Pitch Detection Architecture
+
+```
+Audio Pipeline (mic capture → pitch detection):
+
+  Microphone
+      │
+      ▼
+  getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
+      │
+      ▼
+  AudioContext (44100 Hz)
+      │
+      ▼
+  MediaStreamSourceNode
+      │
+      ▼
+  AnalyserNode (fftSize: 2048)
+      │
+      ▼
+  getFloatTimeDomainData() → Float32Array (called per animation frame)
+      │
+      ▼
+  WASM Pitch Detector (Rust, YIN algorithm)
+      │
+      ▼
+  { frequency: f32, clarity: f32 }
+      │
+      ▼
+  frequencyToNote() → { name, octave, cents }
+      │
+      ▼
+  Note Onset/Offset Detector → DetectedNote[]
+```
+
+**Why WASM over a JS pitch detection library (e.g. Pitchy)?**
+
+- **Lower latency**: YIN algorithm in Rust/WASM runs 3-5x faster than equivalent JS, critical for real-time feedback
+- **Deterministic performance**: No GC pauses during pitch analysis; consistent frame timing
+- **Future-proof**: AudioWorklet + WASM enables off-main-thread processing (Phase 3 optimization)
+- **Precision**: Rust's f32/f64 math compiles to native WASM float ops without JS number coercion edge cases
+
+**WASM module interface** (Rust → wasm-bindgen exports):
+
+```rust
+#[wasm_bindgen]
+pub fn detect_pitch(samples: &[f32], sample_rate: f32, threshold: f32) -> JsValue
+// Returns { frequency: f32, clarity: f32 } or null if no pitch detected
+```
+
+**Build pipeline**: `wasm-pack build --target bundler` → generates ES module imported by `pitch-detector.ts`
+
+---
+
 ## Key Technical Notes
 
 1. **Imports** — All shared code lives in `_`-prefixed folders (`_components`, `_lib`, `_types`, `_hooks`, `_stores`, `_data`, `_utils`, `_constants`, `_interfaces`). Use `@_*` path aliases and barrel files (`index.ts`) for clean imports. See README for details.
-2. **Pitch detection is monophonic only for MVP** -- start with single-note melodies. Chord detection is a much harder problem and can be a future enhancement.
+2. **Pitch detection is monophonic only for MVP** -- start with single-note melodies. Uses a Rust-compiled WASM module implementing the YIN algorithm for sub-millisecond pitch detection. The WASM module is loaded as an ES module via wasm-pack's `bundler` target and invoked from the main thread (AudioWorklet integration is a future optimization). Chord detection is a much harder problem and can be a future enhancement.
 3. **OSMD is a large library (~2MB)** -- dynamically import it only on the practice/piece pages to keep the initial bundle small. Use `next/dynamic` with `ssr: false` since OSMD needs the DOM.
 4. **3D scene isolation** -- render the R3F canvas only on the practice page, lazy-loaded. Run audio analysis in a Web Worker to avoid competing with the Three.js render loop.
-5. **Neon serverless driver** -- use `@neondatabase/serverless` for edge-compatible connections. Works seamlessly with Vercel's edge runtime.
+5. **Vercel Postgres driver** -- use `@vercel/postgres` which reads `POSTGRES_URL` from env automatically. Works seamlessly with Vercel's edge runtime.
 6. **Biome.js configuration** -- enforce consistent formatting (tabs vs spaces, semicolons, quotes) project-wide. Set up a `biome.json` at root with recommended rules plus any custom preferences.
 7. **Future CMS note** -- for now, pieces are bundled as static MusicXML files and seeded to the DB. A future admin interface could allow uploading MusicXML/PDF/audio, auto-extracting metadata, and managing the piece catalog. The schema already supports this -- just needs a UI and file storage (Vercel Blob or S3).
 

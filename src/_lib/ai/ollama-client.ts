@@ -13,16 +13,16 @@ export interface OllamaResponse {
 	done: boolean;
 }
 
-const OLLAMA_BASE_URL = process.env.OLLAMA_URL ?? "http://localhost:11434";
+import { env } from "../env";
 
 export async function generateFeedback(_prompt: string, _systemPrompt?: string): Promise<string> {
-	// TODO: POST to ${OLLAMA_BASE_URL}/api/generate
-	void OLLAMA_BASE_URL;
+	// TODO: POST to ${env.ollamaUrl}/api/generate
+	void env.ollamaUrl;
 	throw new Error("Not implemented");
 }
 
 export async function checkOllamaHealth(): Promise<boolean> {
-	// TODO: GET ${OLLAMA_BASE_URL}/api/tags to verify Ollama is running
-	void OLLAMA_BASE_URL;
+	// TODO: GET ${env.ollamaUrl}/api/tags to verify Ollama is running
+	void env.ollamaUrl;
 	return false;
 }

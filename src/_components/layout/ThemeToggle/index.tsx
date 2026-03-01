@@ -31,8 +31,12 @@ function persistTheme(theme: Theme) {
 function applyTheme(theme: Theme) {
 	const root = document.documentElement;
 	root.classList.remove("light", "dark");
-	if (theme !== "system") {
-		root.classList.add(theme);
+	if (theme === "dark") root.classList.add("dark");
+	else if (theme === "light") root.classList.add("light");
+	else if (theme === "system") {
+		root.classList.add(
+			window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+		);
 	}
 }
 

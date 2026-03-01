@@ -1,5 +1,6 @@
 export type {
 	AudioCaptureState,
+	AudioPipelineConfig,
 	DetectedNote,
 	PitchDetectionConfig,
 } from "./audio";

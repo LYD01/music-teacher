@@ -1,14 +1,24 @@
 // GET: Fetch user's piece progress
-// POST: Update progress after a practice session
+// POST: Update progress after a practice session (handled via sessions API)
 
+import { auth } from "@_lib/auth-server";
+import { getProgressByUser, getProgressForPiece } from "@_lib/db/queries/progress";
 import { NextResponse } from "next/server";
 
-export async function GET() {
-	// TODO: Auth check, fetch user_piece_progress from DB
-	return NextResponse.json({ message: "Progress endpoint not implemented yet" }, { status: 501 });
-}
+export async function GET(request: Request) {
+	const { data: session } = await auth.getSession();
+	if (!session?.user?.id) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
 
-export async function POST() {
-	// TODO: Auth check, parse body, update user_piece_progress in DB
-	return NextResponse.json({ message: "Progress endpoint not implemented yet" }, { status: 501 });
+	const { searchParams } = new URL(request.url);
+	const pieceId = searchParams.get("pieceId");
+
+	if (pieceId) {
+		const progress = await getProgressForPiece(session.user.id, pieceId);
+		return NextResponse.json(progress ?? { message: "No progress yet" });
+	}
+
+	const progress = await getProgressByUser(session.user.id);
+	return NextResponse.json(progress);
 }

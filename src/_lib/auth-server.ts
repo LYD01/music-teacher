@@ -1,18 +1,11 @@
 import { createNeonAuth } from "@neondatabase/neon-js/auth/next/server";
-
-const baseUrl = process.env.NEON_AUTH_BASE_URL || process.env.NEXT_PUBLIC_NEON_AUTH_URL;
-const cookieSecret = process.env.NEON_AUTH_COOKIE_SECRET;
-
-if (!baseUrl) {
-	throw new Error("NEON_AUTH_BASE_URL or NEXT_PUBLIC_NEON_AUTH_URL must be set");
-}
-if (!cookieSecret) {
-	throw new Error("NEON_AUTH_COOKIE_SECRET is not set");
-}
+import { env } from "./env";
 
 export const auth = createNeonAuth({
-	baseUrl,
+	baseUrl: env.neonAuthBaseUrl,
 	cookies: {
-		secret: cookieSecret,
+		secret: env.neonAuthCookieSecret,
+		// Re-validate session with auth server every 24 hours
+		sessionDataTtl: 24 * 60 * 60, // 24 hours in seconds
 	},
 });

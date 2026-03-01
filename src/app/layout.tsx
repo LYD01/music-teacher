@@ -2,6 +2,7 @@ import { Footer, NeonAuthProvider, RouteAnnouncer, SkipLink } from "@_components
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from "next/headers";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,6 +34,8 @@ export default async function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
 			>
+				<Script id="theme-init" src="/theme-init.js" strategy="beforeInteractive" />
+
 				<SkipLink />
 				<RouteAnnouncer />
 				<NeonAuthProvider>

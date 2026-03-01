@@ -1,0 +1,20 @@
+{
+	"rustc": 8323788817864214825,
+	"features": "[]",
+	"declared_features": "[]",
+	"target": 9145753258742256657,
+	"profile": 11064242088019740866,
+	"path": 10763286916239946207,
+	"deps": [],
+	"local": [
+		{
+			"CheckDepInfo": {
+				"dep_info": "wasm32-unknown-unknown\\release\\.fingerprint\\pitch-detector-db8e6e3ce8d321bb\\dep-lib-pitch_detector",
+				"checksum": false
+			}
+		}
+	],
+	"rustflags": [],
+	"config": 2069994364910194474,
+	"compile_kind": 14682669768258224367
+}
