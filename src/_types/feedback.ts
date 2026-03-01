@@ -34,3 +34,27 @@ export interface AvatarConfig {
 	modelUrl: string | null;
 	modelName: string;
 }
+
+// ── Live feedback (streaming, during practice) ──────────────────────
+
+export type FeedbackTrigger = "periodic" | "good_streak" | "bad_streak" | "section_end";
+
+export type LiveFeedbackType = "encouragement" | "coaching" | "celebration" | "tip";
+
+export interface LiveFeedbackMessage {
+	id: string;
+	text: string;
+	type: LiveFeedbackType;
+	timestamp: number;
+}
+
+export interface LiveFeedbackRequest {
+	trigger: FeedbackTrigger;
+	pieceTitle: string;
+	recentCorrect: number;
+	recentIncorrect: number;
+	runningAccuracy: number;
+	consecutiveHits: number;
+	consecutiveMisses: number;
+	previousMessage: string;
+}

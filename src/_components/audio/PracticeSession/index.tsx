@@ -5,11 +5,11 @@ import { AudioVisualizer } from "@_components/audio/AudioVisualizer";
 import { PitchDisplay } from "@_components/audio/PitchDisplay";
 import { AvatarController } from "@_components/avatar/AvatarController";
 import { Badge } from "@_components/common/Badge";
-import { FeedbackPanel } from "@_components/feedback/FeedbackPanel";
 import { NoteOverlay } from "@_components/sheet-music/NoteOverlay";
 import { PracticeSheetMusicViewer } from "@_components/sheet-music/PracticeSheetMusicViewer";
 import type { SheetMusicViewerHandle } from "@_components/sheet-music/SheetMusicViewer";
 import { useComparison } from "@_hooks/use-comparison";
+import { useLiveFeedback } from "@_hooks/use-live-feedback";
 import { useMicrophone } from "@_hooks/use-microphone";
 import { useNoteDetection } from "@_hooks/use-note-detection";
 import { usePitchDetection } from "@_hooks/use-pitch-detection";
@@ -17,6 +17,17 @@ import type { AccuracyReport, DetectedNote, FeedbackResponse, Piece } from "@_ty
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type ProgressInfo, ScoreDisplay } from "./ScoreDisplay";
+
+function formatFeedbackAsBubble(fb: FeedbackResponse): string {
+	const parts = [fb.message];
+	if (fb.suggestions.length > 0) {
+		parts.push(fb.suggestions[0]);
+	}
+	if (fb.encouragement) {
+		parts.push(fb.encouragement);
+	}
+	return parts.join(" ");
+}
 
 const difficultyVariant = {
 	beginner: "accent" as const,
@@ -84,11 +95,18 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 		reset: resetComparison,
 	} = useComparison(piece.musicxmlPath, piece.tempo || 120);
 
+	const liveFeedback = useLiveFeedback({
+		pieceTitle: piece.title,
+		isRecording: mic.isCapturing,
+		notes,
+		expectedNotes,
+	});
+
 	const [isStarting, setIsStarting] = useState(false);
 	const [showResults, setShowResults] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [progress, setProgress] = useState<ProgressInfo | null>(null);
-	const [feedback, setFeedback] = useState<FeedbackResponse | null>(null);
+	const [sessionFeedbackText, setSessionFeedbackText] = useState<string | null>(null);
 	const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
 	const notesRef = useRef<DetectedNote[]>([]);
 	notesRef.current = notes;
@@ -99,7 +117,7 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 		setShowResults(false);
 		resetComparison();
 		setProgress(null);
-		setFeedback(null);
+		setSessionFeedbackText(null);
 		sessionStartRef.current = new Date();
 		setIsStarting(true);
 		await mic.start();
@@ -114,6 +132,16 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 		}
 	}, [mic.stop, analyze]);
 
+	const handleRequestFeedback = useCallback(() => {
+		if (!report || isFeedbackLoading) return;
+		setIsFeedbackLoading(true);
+		fetchFeedback(piece.title, report)
+			.then((fb) => {
+				if (fb) setSessionFeedbackText(formatFeedbackAsBubble(fb));
+			})
+			.finally(() => setIsFeedbackLoading(false));
+	}, [report, piece.title, isFeedbackLoading]);
+
 	useEffect(() => {
 		if (!showResults || !report || !sessionStartRef.current) return;
 
@@ -123,17 +151,6 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 			setIsSaving(false);
 		});
 	}, [showResults, report, piece.id]);
-
-	useEffect(() => {
-		if (!showResults || !report) return;
-
-		setIsFeedbackLoading(true);
-		fetchFeedback(piece.title, report)
-			.then((fb) => {
-				if (fb) setFeedback(fb);
-			})
-			.finally(() => setIsFeedbackLoading(false));
-	}, [showResults, report, piece.title]);
 
 	const sessionStartTime = sessionStartRef.current ? sessionStartRef.current.getTime() : null;
 
@@ -236,17 +253,20 @@ export function PracticeSession({ piece }: PracticeSessionProps) {
 							</>
 						)}
 
-						{/* 3D Avatar teacher */}
+						{/* 3D Avatar teacher with speech bubble feedback */}
 						<AvatarController
 							isRecording={mic.isCapturing}
 							notes={notes}
 							expectedNotes={expectedNotes}
 							report={report}
 							showResults={showResults}
+							feedbackMessages={liveFeedback.messages}
+							feedbackStreamingText={liveFeedback.streamingText}
+							isFeedbackStreaming={liveFeedback.isStreaming}
+							sessionFeedbackText={sessionFeedbackText}
+							isSessionFeedbackLoading={isFeedbackLoading}
+							onRequestFeedback={handleRequestFeedback}
 						/>
-
-						{/* AI Feedback */}
-						{showResults && <FeedbackPanel feedback={feedback} isLoading={isFeedbackLoading} />}
 					</div>
 				</div>
 			</div>

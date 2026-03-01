@@ -9,6 +9,10 @@ export type {
 	AvatarConfig,
 	AvatarMood,
 	FeedbackResponse,
+	FeedbackTrigger,
+	LiveFeedbackMessage,
+	LiveFeedbackRequest,
+	LiveFeedbackType,
 	ReactionEvent,
 } from "./feedback";
 export type {
