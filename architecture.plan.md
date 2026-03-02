@@ -619,6 +619,13 @@ Guardrails: maximum 1 in-flight request, triggers during cooldown are dropped.
 
 ---
 
+## Potential Future Features
+
+- **Spotify integration**: Browse songs from Spotify, select a track, generate sheet music from it (via AI or transcription services), and add it to the user's library as a practice session.
+- **CMS**: Content management interface for uploading MusicXML, PDF, or audio files, tagging with metadata, and adding to the library (see Sheet Music Strategy).
+
+---
+
 ## Key Technical Notes
 
 1. **Imports** — All shared code lives in `_`-prefixed folders (`_components`, `_lib`, `_types`, `_hooks`, `_stores`, `_data`, `_utils`, `_constants`, `_interfaces`). Use `@_*` path aliases and barrel files (`index.ts`) for clean imports. See README for details.

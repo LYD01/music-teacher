@@ -87,29 +87,176 @@ const SEED_PIECES = [
 		tempo: 88,
 		measureCount: 8,
 	},
+	// Beginner exercises - Note learning
+	{
+		title: "Open String Notes",
+		composer: "Exercise",
+		difficulty: "beginner",
+		genre: "classical",
+		style: "Exercise",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/open-string-notes.musicxml",
+		tempo: 60,
+		measureCount: 8,
+	},
+	{
+		title: "Notes on the High E String",
+		composer: "Exercise",
+		difficulty: "beginner",
+		genre: "classical",
+		style: "Exercise",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/first-string-notes.musicxml",
+		tempo: 70,
+		measureCount: 8,
+	},
+	{
+		title: "Notes on the B String",
+		composer: "Exercise",
+		difficulty: "beginner",
+		genre: "classical",
+		style: "Exercise",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/second-string-notes.musicxml",
+		tempo: 70,
+		measureCount: 8,
+	},
+	// Beginner exercises - Chords
+	{
+		title: "Basic Open Chords",
+		composer: "Exercise",
+		difficulty: "beginner",
+		genre: "classical",
+		style: "Chords",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/basic-open-chords.musicxml",
+		tempo: 60,
+		measureCount: 8,
+	},
+	{
+		title: "Am - Dm - E Progression",
+		composer: "Exercise",
+		difficulty: "beginner",
+		genre: "classical",
+		style: "Chords",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/am-dm-e-progression.musicxml",
+		tempo: 72,
+		measureCount: 8,
+	},
+	// Spanish guitar classics
+	{
+		title: "Capricho Árabe (Theme)",
+		composer: "Francisco Tárrega",
+		difficulty: "advanced",
+		genre: "classical",
+		style: "Capricho",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/capricho-arabe.musicxml",
+		tempo: 76,
+		measureCount: 8,
+	},
+	{
+		title: "Recuerdos de la Alhambra (Theme)",
+		composer: "Francisco Tárrega",
+		difficulty: "advanced",
+		genre: "classical",
+		style: "Tremolo",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/recuerdos-theme.musicxml",
+		tempo: 72,
+		measureCount: 8,
+	},
+	{
+		title: "Asturias (Leyenda) - Theme",
+		composer: "Isaac Albéniz",
+		difficulty: "advanced",
+		genre: "classical",
+		style: "Leyenda",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/asturias-theme.musicxml",
+		tempo: 84,
+		measureCount: 8,
+	},
+	{
+		title: "Prelude No. 1 in E minor (Theme)",
+		composer: "Heitor Villa-Lobos",
+		difficulty: "advanced",
+		genre: "classical",
+		style: "Prelude",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/prelude-emin-villalobos.musicxml",
+		tempo: 66,
+		measureCount: 8,
+	},
+	{
+		title: "Spanish Study in A minor",
+		composer: "Traditional Spanish",
+		difficulty: "intermediate",
+		genre: "classical",
+		style: "Study",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/spanish-study-am.musicxml",
+		tempo: 80,
+		measureCount: 8,
+	},
+	{
+		title: "Farruca",
+		composer: "Traditional Flamenco",
+		difficulty: "intermediate",
+		genre: "latin",
+		style: "Dance",
+		instrumentId: "acoustic-guitar",
+		musicxmlPath: "/pieces/farruca.musicxml",
+		tempo: 88,
+		measureCount: 8,
+	},
 ] as const;
 
 const SEED_COLLECTIONS = [
+	{
+		name: "Learn Your Notes",
+		description:
+			"Start here! Learn the names of each open string and first-position notes on your guitar.",
+		difficulty: "beginner",
+		genre: "classical",
+		sortOrder: 1,
+	},
+	{
+		name: "Chord Foundations",
+		description: "Practice essential open chords and common Spanish guitar chord progressions.",
+		difficulty: "beginner",
+		genre: "classical",
+		sortOrder: 2,
+	},
 	{
 		name: "Beginner Classical",
 		description: "Simple single-note melodies perfect for getting started with classical guitar.",
 		difficulty: "beginner",
 		genre: "classical",
-		sortOrder: 1,
+		sortOrder: 3,
 	},
 	{
 		name: "Intermediate Studies",
 		description: "Tárrega studies and pieces for developing technique and musicality.",
 		difficulty: "intermediate",
 		genre: "classical",
-		sortOrder: 2,
+		sortOrder: 4,
+	},
+	{
+		name: "Spanish Guitar Classics",
+		description:
+			"Iconic works by Tárrega, Albéniz, and Villa-Lobos — the pillars of classical guitar.",
+		difficulty: "advanced",
+		genre: "classical",
+		sortOrder: 5,
 	},
 	{
 		name: "World Folk & Latin",
 		description: "Traditional melodies from around the world, arranged for solo guitar.",
 		difficulty: "beginner",
 		genre: "folk",
-		sortOrder: 3,
+		sortOrder: 6,
 	},
 ] as const;
 
@@ -139,14 +286,44 @@ async function seed() {
 
 	console.log(`  Inserted ${insertedCollections.length} collections`);
 
+	const learnNotes = insertedCollections.find((c) => c.name === "Learn Your Notes");
+	const chordFoundations = insertedCollections.find((c) => c.name === "Chord Foundations");
 	const beginnerClassical = insertedCollections.find((c) => c.name === "Beginner Classical");
 	const intermediateStudies = insertedCollections.find((c) => c.name === "Intermediate Studies");
+	const spanishClassics = insertedCollections.find((c) => c.name === "Spanish Guitar Classics");
 	const worldFolk = insertedCollections.find((c) => c.name === "World Folk & Latin");
+
+	const noteExerciseTitles = [
+		"Open String Notes",
+		"Notes on the High E String",
+		"Notes on the B String",
+	];
+	const chordExerciseTitles = ["Basic Open Chords", "Am - Dm - E Progression"];
 
 	const collectionMappings: { collectionId: string; pieceTitle: string; sortOrder: number }[] = [];
 
 	for (const p of insertedPieces) {
-		if (p.difficulty === "beginner" && p.genre === "classical" && beginnerClassical) {
+		if (noteExerciseTitles.includes(p.title) && learnNotes) {
+			collectionMappings.push({
+				collectionId: learnNotes.id,
+				pieceTitle: p.title,
+				sortOrder: collectionMappings.length,
+			});
+		}
+		if (chordExerciseTitles.includes(p.title) && chordFoundations) {
+			collectionMappings.push({
+				collectionId: chordFoundations.id,
+				pieceTitle: p.title,
+				sortOrder: collectionMappings.length,
+			});
+		}
+		if (
+			p.difficulty === "beginner" &&
+			p.genre === "classical" &&
+			!noteExerciseTitles.includes(p.title) &&
+			!chordExerciseTitles.includes(p.title) &&
+			beginnerClassical
+		) {
 			collectionMappings.push({
 				collectionId: beginnerClassical.id,
 				pieceTitle: p.title,
@@ -156,6 +333,13 @@ async function seed() {
 		if (p.difficulty === "intermediate" && intermediateStudies) {
 			collectionMappings.push({
 				collectionId: intermediateStudies.id,
+				pieceTitle: p.title,
+				sortOrder: collectionMappings.length,
+			});
+		}
+		if (p.difficulty === "advanced" && spanishClassics) {
+			collectionMappings.push({
+				collectionId: spanishClassics.id,
 				pieceTitle: p.title,
 				sortOrder: collectionMappings.length,
 			});
