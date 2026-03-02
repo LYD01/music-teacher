@@ -10,10 +10,10 @@ todos:
     status: completed
   - id: phase3-audio-practice
     content: "Phase 3: Mic capture (Web Audio API), WASM pitch detection (Rust/wasm-pack, YIN algorithm), note detector, comparison engine, practice page, save sessions + progress to DB"
-    status: pending
+    status: completed
   - id: phase4-avatar-feedback
-    content: "Phase 4: React Three Fiber scene, Mixamo character + animations, animation state machine, Ollama AI feedback, feedback panel"
-    status: pending
+    content: "Phase 4: React Three Fiber scene, universal 3D model upload (any GLB), transform-based reaction system, live note feedback via avatar, Ollama AI feedback, feedback panel"
+    status: completed
   - id: phase5-dashboard-history
     content: "Phase 5: Dashboard parallel routes (@history, @progress), history feed, progress cards, full history page with pagination"
     status: pending
@@ -440,15 +440,20 @@ Each activity row stores a `metadata` JSONB field for flexible data (scores, dur
 - ~~Save practice sessions to DB~~ ✅
 - ~~Update `user_piece_progress` after each session~~ ✅
 
-### Phase 4: 3D Avatar + Feedback
+### Phase 4: 3D Avatar + Feedback (COMPLETED)
 
-- Set up React Three Fiber scene
-- Source rigged character (Ready Player Me / Mixamo)
-- Download and integrate 4-6 Mixamo animations
-- Build animation state machine mapping scores to gestures
-- Integrate Ollama for AI text feedback
-- Build `FeedbackPanel` and `ScoreBreakdown` components
-- Graceful fallback when Ollama is not running
+- ~~Set up React Three Fiber scene (Canvas, lighting, environment, OrbitControls)~~ ✅
+- ~~Universal 3D model support — users upload any `.glb` model (shark, Roblox character, etc.) as their avatar teacher~~ ✅
+- ~~Default procedural avatar (capsule body + eyes) for users without a custom model~~ ✅
+- ~~Transform-based reaction system (bounce, wobble, glow, scale pulse, spin) — works with ANY model, no skeleton required~~ ✅
+- ~~Live note-by-note avatar reactions: good_note (green glow + bounce), bad_note (red flash + wobble), great_streak (gold glow + spin), celebrating (big bounce + particles)~~ ✅
+- ~~Reaction particle effects (instanced mesh sparkles for good/great/celebrating moods)~~ ✅
+- ~~Model upload via `.glb` file input, persisted to IndexedDB + localStorage~~ ✅
+- ~~AvatarController bridges live note detection → mood → avatar transforms~~ ✅
+- ~~Integrate Ollama for AI text feedback with graceful fallback when Ollama is not running~~ ✅
+- ~~Build enhanced `FeedbackPanel` with suggestions, encouragement, and focus areas~~ ✅
+- ~~`/api/feedback` route proxies to Ollama, returns structured JSON feedback~~ ✅
+- ~~Score-based fallback feedback when Ollama is unavailable~~ ✅
 
 ### Phase 5: Dashboard + History
 
@@ -520,6 +525,104 @@ pub fn detect_pitch(samples: &[f32], sample_rate: f32, threshold: f32) -> JsValu
 ```
 
 **Build pipeline**: `wasm-pack build --target bundler` → generates ES module imported by `pitch-detector.ts`
+
+---
+
+## Ollama Live Feedback Architecture
+
+### Overview
+
+Ollama provides two modes of AI feedback during practice:
+
+1. **Live micro-feedback** (streaming, during practice) — short 1-sentence messages displayed in a Twitch chat-style overlay below the avatar
+2. **Post-session summary** (non-streaming, after practice) — structured JSON feedback in the `FeedbackPanel`
+
+### Ollama Configuration
+
+- **Default URL**: `http://localhost:11434` (override via `OLLAMA_URL` env var)
+- **Model**: `llama3.2` (local, ~2GB download on first use)
+- **Health check**: `GET /api/tags` with 3s timeout before any generation request
+- **Fallback**: When Ollama is unavailable, both modes return pre-written score-based/trigger-based fallback messages
+
+### Streaming Pipeline
+
+```
+Practice Session (client)
+    │
+    ▼
+useLiveFeedback hook
+    │  ── detects triggers (periodic 15s, good streak 5+, bad streak 3+)
+    │  ── enforces 8s cooldown, 1 in-flight max
+    │
+    ▼
+POST /api/feedback/stream
+    │  ── health check → fallback if Ollama down
+    │  ── builds short-form prompt (trigger, recent notes, accuracy)
+    │
+    ▼
+Ollama /api/generate (stream: true)
+    │  ── NDJSON: { "response": "token", "done": false }
+    │
+    ▼
+ReadableStream proxied to client
+    │
+    ▼
+LiveFeedbackChat component
+    ── accumulates tokens → completed message
+    ── auto-scrolls, fades old messages
+    ── transparent bg, Twitch chat aesthetic
+```
+
+### Trigger System
+
+| Trigger | Condition | Cooldown | Prompt Tone |
+|---|---|---|---|
+| `periodic` | Every ~15s of playing | 8s min | Observational, varied |
+| `good_streak` | 5+ correct notes in row | 8s min | Celebratory |
+| `bad_streak` | 3+ wrong notes in row | 8s min | Gentle coaching |
+| `section_end` | Phrase boundary reached | 8s min | Section commentary |
+
+Guardrails: maximum 1 in-flight request, triggers during cooldown are dropped.
+
+### Prompt Design
+
+**Live feedback** uses a separate system prompt optimized for brevity:
+- 1 sentence max, 15 words or fewer
+- Plain text output (no JSON)
+- Receives: trigger reason, last ~10 notes (correct/incorrect), running accuracy %, piece title
+- Previous message included to prevent repetition
+
+**Post-session feedback** retains the existing structured JSON prompt (message, suggestions, encouragement, focusAreas).
+
+### UI: LiveFeedbackChat (Twitch Chat Style)
+
+- Transparent background, no card/border — floats below avatar in the right sidebar
+- Fixed height (~200px), messages stack from bottom
+- CSS mask gradient fades oldest messages at top
+- New messages slide up with fade-in animation
+- Streaming messages show token-by-token with blinking cursor
+- Hidden scrollbar (`scrollbar-width: none`)
+- Colored dot per message type (green = encouragement, yellow = tip, blue = coaching, gold = celebration)
+- Max ~6-8 visible messages before recycling
+
+### Key Files
+
+| File | Purpose |
+|---|---|
+| `src/_lib/ai/ollama-client.ts` | HTTP client: `generateFeedback()` (non-stream) + `generateFeedbackStream()` (stream) |
+| `src/_lib/ai/prompts.ts` | System prompts + prompt builders for both modes |
+| `src/app/api/feedback/route.ts` | POST: non-streaming post-session feedback proxy |
+| `src/app/api/feedback/stream/route.ts` | POST: streaming live feedback proxy |
+| `src/_hooks/use-live-feedback.ts` | Client hook: trigger detection, cooldown, stream consumer |
+| `src/_components/feedback/LiveFeedbackChat/` | Twitch chat UI component |
+| `src/_components/feedback/FeedbackPanel/` | Post-session structured feedback panel |
+
+---
+
+## Potential Future Features
+
+- **Spotify integration**: Browse songs from Spotify, select a track, generate sheet music from it (via AI or transcription services), and add it to the user's library as a practice session.
+- **CMS**: Content management interface for uploading MusicXML, PDF, or audio files, tagging with metadata, and adding to the library (see Sheet Music Strategy).
 
 ---
 
