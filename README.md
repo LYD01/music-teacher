@@ -1,4 +1,4 @@
-# Music Teacher
+# Music Teacher (made with ai)
 
 ## Setup
 
